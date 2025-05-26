@@ -1,6 +1,6 @@
-# Line-of-business Chatbot Sample
+# Line-of-Business Agent with Evaluation
 
-This project demonstrates a line-of-business (LOB) chatbot implementation using a Support Ticket Management System as the sample application. It showcases both a functional workflow for managing support tickets and a methodology for evaluating chatbot performance in business contexts.
+This project demonstrates a line-of-business (LOB) chatbot implementation using a Support Ticket Management System as the sample application. It showcases both a functional workflow for managing support tickets and a methodology for evaluating LOB agent's performance in business contexts.
 
 ## Key Features
 
@@ -16,7 +16,7 @@ Refer to the [architecture](./docs/architecture/support-ticket-chatbot-architect
 
 ### Evaluation Framework
 
-The project includes an evaluation framework designed to address the challenges of assessing non-deterministic, LLM-powered chatbots in business applications with key features:
+The project includes an evaluation framework designed to address the challenges of assessing non-deterministic, LLM-powered agents in business applications with key features:
 
 - LLM-based user agent for simulating user-chatbot interactions
 - Test cases factory with scenarios templating and injection of business data to run evaluations at scale
