@@ -1,14 +1,14 @@
-# Line-of-Business Chatbot Evaluation Framework
+# Line-of-Business Agents Evaluation Framework
 
-## The Challenge of Evaluating LOB Chatbots
+## The Challenge of Evaluating LOB Agents
 
-Evaluating Line-of-Business (LOB) chatbots presents unique challenges that traditional chatbot evaluation methods fail to address adequately:
+Evaluating Line-of-Business (LOB) agents presents unique challenges that traditional evaluation methods fail to address adequately:
 
-1. **Function-calling accuracy is paramount** - Unlike general-purpose chatbots where natural language quality is the primary concern, LOB chatbots must accurately invoke business functions with correct parameters to be effective.
+1. **Function-calling accuracy is paramount** - Unlike general-purpose agents where natural language quality is the primary concern, LOB agents must accurately invoke business functions with correct parameters to be effective.
 
-1. **Complex business workflows** - LOB chatbots must navigate multi-step business processes while maintaining context across conversation turns.
+1. **Complex business workflows** - LOB agents must navigate multi-step business processes while maintaining context across conversation turns.
 
-1. **Deterministic business logic vs. non-deterministic LLM outputs** - While business operations require predictable, consistent outcomes, LLM-powered chatbots produce varying responses to similar inputs.
+1. **Deterministic business logic vs. non-deterministic LLM outputs** - While business operations require predictable, consistent outcomes, LLM-powered agents produce varying responses to similar inputs.
 
 1. **Domain-specific correctness** - Responses must align with business domain rules and constraints that general linguistic quality metrics cannot measure.
 
@@ -18,17 +18,17 @@ Evaluating Line-of-Business (LOB) chatbots presents unique challenges that tradi
 
 ![lob_agent_evaluation_diagram](lob_agent_eval_diagram.png)
 
-The architecture diagram above illustrates our comprehensive approach to LOB chatbot evaluation. This framework specifically addresses the challenges through a systematic process that focuses on function-calling accuracy and business process adherence.
+The architecture diagram above illustrates our comprehensive approach to LOB agent evaluation. This framework specifically addresses the challenges through a systematic process that focuses on function-calling accuracy and business process adherence.
 
 ## Key Components of the Evaluation Framework
 
 ### 1. Ground Truth Dataset Management
 
-The foundation of our evaluation framework is a structured ground truth dataset that defines expected chatbot behaviors ([documentation](../../evaluation/chatbot/ground-truth/README.md)):
+The foundation of our evaluation framework is a structured ground truth dataset that defines expected agent behaviors ([documentation](../../evaluation/chatbot/ground-truth/README.md)):
 
 - **Scenario Templates** – Predefined conversation patterns representing common business workflows stored in [test_scenarios_templates.json](../../evaluation/chatbot/ground-truth/test_scenarios_templates.json)
 - **Business Data Integration** – Real business data (support tickets, action items) from CSV files incorporated into test scenarios
-- **Expected Function Calls** – Precisely defined function calls with arguments the chatbot should make for each scenario
+- **Expected Function Calls** – Precisely defined function calls with arguments the agent should make for each scenario
 - **Relationship Preservation** – Maintains business entity relationships (e.g., tickets to action items) during data generation
 - **Scalable Generation** – Automated dataset creation using [generate_eval_dataset.py](../../evaluation/chatbot/ground-truth/generate_eval_dataset.py) to produce hundreds of test cases
 
@@ -44,24 +44,24 @@ The central orchestrator of the evaluation process ([evaluate.py](../../evaluati
 - **Output Formatting** – Generates structured evaluation reports in JSON format for analysis
 - **Azure Integration** – Optional integration with Azure AI Foundry for tracking evaluation runs and comparing results
 
-The evaluation service loads ground truth data, executes evaluations against the target chatbot, stores results in a standardized format, and automatically executes error analysis notebooks.
+The evaluation service loads ground truth data, executes evaluations against the target agent, stores results in a standardized format, and automatically executes error analysis notebooks.
 
-### 3. Chatbot Simulator
+### 3. Chat Simulator
 
-Simulates realistic user interactions with the chatbot using an LLM-powered User Agent ([chat_simulator.py](../../evaluation/chatbot/simulation/chat_simulator.py)):
+Simulates realistic user interactions with LOB agent using an LLM-powered User Agent ([chat_simulator.py](../../evaluation/chatbot/simulation/chat_simulator.py)):
 
 - **LLM-based User Simulation** - Uses an LLM to generate natural user inputs based on test scenarios, simulating different user personas and interaction styles
 - **Conversation Flow Management** - Handles multi-turn conversations while following scenario instructions and maintaining context
-- **Function Call Recording** - Captures all function calls made by the chatbot during testing, including function names and all arguments
+- **Function Call Recording** - Captures all function calls made by the agent during testing, including function names and all arguments
 - **Termination Strategy** - Automatically detects when conversations are complete based on configurable completion conditions
 
 This component enables systematic testing at scale without requiring human testers, supporting hundreds of test cases efficiently.
 
 ### 4. Specialized Evaluators
 
-A collection of focused metric calculators that measure specific aspects of chatbot performance:
+A collection of focused metric calculators that measure specific aspects of agent performance:
 
-- **Function Call Precision Evaluator** (`FunctionCallPrecisionEvaluator`) – Measures if the chatbot calls the right functions without calling unnecessary ones ([function_call_precision.py](../../evaluation/chatbot/evaluators/function_call_precision.py))
+- **Function Call Precision Evaluator** (`FunctionCallPrecisionEvaluator`) – Measures if the agent calls the right functions without calling unnecessary ones ([function_call_precision.py](../../evaluation/chatbot/evaluators/function_call_precision.py))
 - **Function Call Recall Evaluator** (`FunctionCallRecallEvaluator`) – Assesses if all necessary functions are called ([function_call_recall.py](../../evaluation/chatbot/evaluators/function_call_recall.py))
 - **Function Call Arguments Precision Evaluator** (`FunctionCallArgsPrecisionEvaluator`) – Evaluates parameter accuracy and checks for unnecessary arguments in function calls ([function_call_precision.py](../../evaluation/chatbot/evaluators/function_call_precision.py))
 - **Function Call Arguments Recall Evaluator** (`FunctionCallArgsRecallEvaluator`) – Checks if all required parameters are included in function calls ([function_call_recall.py](../../evaluation/chatbot/evaluators/function_call_recall.py))
@@ -71,20 +71,20 @@ Each evaluator produces a score between 0 and 1, with higher scores indicating b
 
 ## Key Metrics and Interpretation
 
-The framework provides five core metrics that together give a comprehensive view of chatbot performance:
+The framework provides five core metrics that together give a comprehensive view of agent performance:
 
-1. **Function Name Precision** (`Precision_fn`) - Measures if the chatbot calls only the functions it should call (no extra function calls)
-1. **Function Name Recall** (`Recall_fn`) - Measures if the chatbot calls all the functions it should call (no missing function calls)
+1. **Function Name Precision** (`Precision_fn`) - Measures if the agent calls only the functions it should call (no extra function calls)
+1. **Function Name Recall** (`Recall_fn`) - Measures if the agent calls all the functions it should call (no missing function calls)
 1. **Function Arguments Precision** (`Precision_args`) - Measures if function calls contain only the arguments they should contain (no extra arguments)
 1. **Function Arguments Recall** (`Recall_args`) - Measures if function calls contain all the arguments they should contain (no missing arguments)
 1. **Reliability Score** (`Reliability`) - Overall measure of task completion success, calculated as the mean of function name recall and argument recall
 
 **Interpretation Guidelines:**
 
-- **High Precision, Low Recall**: Chatbot is conservative but misses required actions
-- **Low Precision, High Recall**: Chatbot takes all required actions but also unnecessary ones
-- **High Reliability**: Chatbot successfully completes business tasks as intended
-- **Target Scores**: Aim for >0.8 on all metrics for production deployment
+- **High Precision, Low Recall**: Agent is conservative but misses required actions
+- **Low Precision, High Recall**: Agent takes all required actions but also unnecessary ones
+- **High Reliability**: Agent successfully completes business tasks as intended (mean recall of function calls and their arguments)
+- **Target Scores**: Aim for at least >0.8 on all metrics for production deployment
 
 ### 5. Results Analysis & Visualization
 
@@ -92,11 +92,11 @@ Tools for interpreting evaluation results and generating actionable insights:
 
 - **JSON Result Storage** – Detailed metrics stored in machine-readable format for programmatic analysis
 - **Aggregation Across Scenarios** – Performance summarized across different business workflows and test scenarios
-- **Error Analysis** – LLM-powered identification of patterns in chatbot mistakes and conversation failures ([error_analysis_chatbot.ipynb](../../evaluation/chatbot/error_analysis_chatbot.ipynb))
-- **Performance Tracking** – Comparison of metrics across different chatbot versions and configuration changes
+- **Error Analysis** – LLM-powered identification of patterns in agent mistakes and conversation failures ([error_analysis_chatbot.ipynb](../../evaluation/chatbot/error_analysis_chatbot.ipynb))
+- **Performance Tracking** – Comparison of metrics across different agent versions and configuration changes
 - **Azure AI Evaluation SDK Integration** – Leverages Azure's evaluation tools for advanced analysis and optional Azure AI Foundry dashboard integration
 
-This component helps identify specific areas for improvement in the chatbot implementation and provides automated insights from conversation analysis.
+This component helps identify specific areas for improvement in the agent implementation and provides automated insights from conversation analysis.
 
 ## Evaluation Process Flow
 
@@ -104,12 +104,12 @@ This component helps identify specific areas for improvement in the chatbot impl
 
    - Ground truth datasets are loaded
    - Evaluators are initialized
-   - The chatbot target is prepared for testing
+   - The agent target is prepared for testing
 
 1. **Execution Phase**
 
    - For each test scenario, a simulated conversation occurs
-   - The chatbot responds to user inputs and makes function calls
+   - The agent responds to user inputs and makes function calls
    - All function calls are recorded with their arguments
 
 1. **Evaluation Phase**
@@ -160,13 +160,13 @@ The evaluation framework is designed to be extensible:
 1. **Test Scenarios Templating** – Easily expand test coverage by adding new [test_scenarios_templates.json](../../evaluation/chatbot/ground-truth/test_scenarios_templates.json)
 1. **Custom Error Analysis** – Extend [error_analysis_chatbot.ipynb](../../evaluation/chatbot/error_analysis_chatbot.ipynb) to fulfil your use-case requirements
 
-## Best Practices for LOB Chatbot Evaluation
+## Best Practices for LOB Agent Evaluation
 
-1. **Regular Evaluation Cycles** - Run evaluations after significant chatbot changes
+1. **Regular Evaluation Cycles** - Run evaluations after introductin significant changes to the agent
 1. **Comprehensive Scenario Coverage** - Ensure test cases cover all critical business workflows
 1. **Balanced Metric Analysis** - Consider all metrics together rather than optimizing for just one
 1. **Targeted Improvements** - Focus on functions with lowest precision/recall scores
-1. **Iterative Refinement** - Use evaluation results to guide systematic chatbot improvements
+1. **Iterative Refinement** - Use evaluation results to guide systematic agent improvements
 
 ## Performance Benchmarks and Expected Score Ranges
 
@@ -174,21 +174,21 @@ Understanding typical score ranges helps set realistic expectations and identify
 
 ### Baseline Performance Expectations
 
-- **Well-Configured LOB Chatbots**: Should achieve 0.7-0.9 across all metrics
+- **Well-Configured LOB Agents**: Should achieve 0.7-0.9 across all metrics
 - **Production-Ready Systems**: Target >0.8 on all metrics, especially reliability
 - **Development/Testing Phase**: 0.5-0.7 is acceptable for initial iterations
 
 ### Common Score Patterns
 
-- **High Precision, Lower Recall (0.9/0.6)**: Conservative chatbot that misses some required actions
-- **Lower Precision, High Recall (0.6/0.9)**: Aggressive chatbot that over-executes functions
+- **High Precision, Lower Recall (0.9/0.6)**: Conservative agent that misses some required actions
+- **Lower Precision, High Recall (0.6/0.9)**: Aggressive agent that over-executes functions
 - **Balanced Performance (0.8/0.8)**: Well-tuned system suitable for production
 - **Low Overall Scores (\<0.5)**: Indicates fundamental issues requiring investigation
 
 ### Factors Affecting Performance
 
 - **Dataset Quality**: Poor ground truth data leads to misleading evaluation results
-- **Function Definition Clarity**: Ambiguous function descriptions reduce chatbot accuracy
+- **Function Definition Clarity**: Ambiguous function descriptions reduce agent accuracy
 - **Prompt Engineering**: Better prompts typically improve precision and recall
 - **Model Selection**: More capable LLMs generally achieve higher scores
 
@@ -196,7 +196,7 @@ Understanding typical score ranges helps set realistic expectations and identify
 
 ### Low Function Name Precision
 
-**Symptoms**: Chatbot calls unnecessary functions
+**Symptoms**: Agent calls unnecessary functions
 
 **Common Causes**:
 
@@ -306,6 +306,6 @@ python -m evaluation.evaluation_service \
 
 ## Conclusion
 
-This evaluation framework provides a structured, comprehensive approach to measuring and improving LOB chatbot performance. By focusing on function call accuracy and business process adherence, it enables the development of reliable, effective line-of-business chatbots that deliver consistent value.
+This evaluation framework provides a structured, comprehensive approach to measuring and improving LOB agent performance. By focusing on function call accuracy and business process adherence, it enables the development of reliable, effective line-of-business agents that deliver consistent value.
 
 For implementation details, see the [evaluation code](../../evaluation/) and for practical examples of running evaluations, refer to the evaluation notebooks in the repository.
