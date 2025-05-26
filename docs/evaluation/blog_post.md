@@ -68,9 +68,7 @@ Our team recently worked with one of our customers on developing a LOB chatbot t
 
 The evaluation framework diagram below illustrates the architecture of our approach, highlighting its key components and their interactions. We designed it to address the unique challenges of evaluating LOB chatbots, ensuring scalability, reproducibility, and actionable insights. We implemented this framework and shared it in a generalized way along with a demo LOB chatbot for a fake scenario of support tickets management. You can find it here: https://github.com/marcgs/lob-chatbot-sample
 
-TODO: Update evaluation framework diagram to make it super general. Add error analysis.
-
-![lob_chatbot_evaluation_diagram](./lob_chatbot_eval_diagram.png)
+![lob_chatbot_evaluation_diagram](./lob_agent_eval_diagram.png)
 
 In the following sections, we will break it down by key components and provide in-depth explanations based on the real solution that we developed and tested.
 
