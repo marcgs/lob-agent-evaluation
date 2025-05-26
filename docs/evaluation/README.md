@@ -16,7 +16,7 @@ Evaluating Line-of-Business (LOB) chatbots presents unique challenges that tradi
 
 ## Evaluation Framework Architecture
 
-![lob_chatbot_evaluation_diagram](lob_agent_eval_diagram.png)
+![lob_agent_evaluation_diagram](lob_agent_eval_diagram.png)
 
 The architecture diagram above illustrates our comprehensive approach to LOB chatbot evaluation. This framework specifically addresses the challenges through a systematic process that focuses on function-calling accuracy and business process adherence.
 
