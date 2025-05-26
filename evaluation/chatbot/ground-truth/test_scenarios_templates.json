@@ -27,6 +27,33 @@
     ]
   },
   {
+    "scenario_name": "cmd_create_ticket_and_action_item",
+    "user_instructions": "Create a new support ticket by manually providing the data and create a new action item for it. Don't use full sentences but only command-like terms 'search ...', 'new action ...', etc. If presented with a numerical list of options, use the number of the option to select it.",
+    "task_completion": "The user has confirmed the end of the session.",
+    "expected_function_calls": [
+      {
+        "functionName": "TicketManagementPlugin-create_support_ticket",
+        "arguments": {
+          "title": "{ticket.title}",
+          "department_code": "{ticket.department_code}",
+          "priority": "{ticket.priority}",
+          "workflow_type": "{ticket.workflow_type}",
+          "description": "{ticket.description}",
+          "expected_outcome": "{ticket.expected_outcome}",
+          "customer_visible": "{ticket.customer_visible}"
+        }
+      },
+      {
+        "functionName": "ActionItemPlugin-create_action_item",
+        "arguments": {
+          "title": "{action.title}",
+          "assignee": "{action.assignee}",
+          "due_date": "{action.due_date}"
+        }
+      }
+    ]
+  },
+  {
     "scenario_name": "search_and_update_ticket",
     "user_instructions": "Search for a ticket using keyword 'printer', select any of the results and update its description, department and priority fields.",
     "task_completion": "The user has confirmed the end of the session.",
