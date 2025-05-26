@@ -62,7 +62,7 @@ The evaluation framework diagram below illustrates the architecture of our appro
 
 TODO: Update evaluation framework diagram to make it super general. Add error analysis.
 
-![lob_chatbot_evaluation_diagram](./docs/evaluation/lob_chatbot_eval_diagram.png)
+![lob_chatbot_evaluation_diagram](./lob_chatbot_eval_diagram.png)
 
 In the following sections, we will break it down by key components and provide in-depth explanations based on the real solution that we developed and tested.
 
@@ -341,7 +341,7 @@ The evaluation framework integrates with the [Azure AI Evaluation SDK](https://l
 
 One huge benefit of using the Azure AI Evaluation SDK is that by adding a single argument, we enable an optional [Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/) integration. This gives us a convenient dashboard for tracking evaluation runs, a single place to store our metrics and make comparisons between different runs. It becomes especially important and useful with long-running evaluations (hundreds or thousands of test cases which might take several hours).
 
-![azure-ai-foundry-eval](./docs/evaluation/azure-ai-foundry-eval.png)
+![azure-ai-foundry-eval](./azure-ai-foundry-eval.png)
 
 ### Error Analysis
 
