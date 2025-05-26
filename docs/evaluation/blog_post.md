@@ -23,7 +23,7 @@ Evaluating conversational AI presents a spectrum of challenges that vary dramati
 ---
 *NOTE: You might have noticed we sometimes use `LOB chatbots` and `LOB agents` interchangeably, however there's a small distinction in understanding of these terms:*
 
-- *`LOB chatbot` refers to the overall solution, offering conversational UX for users to interact with internal LOB systems.*
+- *`LOB chatbot` typically refers to a complete system which offers a conversational UX for users to interact with internal LOB systems.*
 - *`LOB agent` refers to the LLM-powered component responsible for managing conversations and guiding users through available chat paths, maintaining conversation state and calling the appropriate functions (APIs) to fulfill user tasks.*
 
 *If you would like to better understand the role of `agents` in conversational AI, I encourage you to check out [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) blog post by Anthropic.*
