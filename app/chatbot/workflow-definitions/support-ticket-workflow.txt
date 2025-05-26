@@ -1,4 +1,4 @@
-// filepath: /workspaces/lob-chatbot-sample/app/chatbot/workflow-definitions/support-ticket-workflow.txt
+// filepath: /workspaces/lob-agent-evaluation/app/chatbot/workflow-definitions/support-ticket-workflow.txt
 0. Gather information to perform the next steps. 
    a. Greet the User and offer the following options:
       1. Create a new support ticket.

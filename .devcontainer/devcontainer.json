@@ -1,5 +1,5 @@
 {
-    "name": "lob-chatbot-sample",
+    "name": "lob-agent-evaluation",
     "image": "mcr.microsoft.com/devcontainers/python:3.11",
     "features": {
     },
