@@ -8,7 +8,7 @@ Traditional chatbot evaluation frameworks fall short when applied to modern LLM-
 
 This evaluation gap creates significant challenges for enterprises deploying LLM-powered chatbots in business-critical scenarios. When a system can respond to the same query in multiple valid ways, or when the correct response depends on subtle contextual factors, evaluation frameworks must evolve beyond simplistic pass/fail paradigms to assess both functional correctness and conversational effectiveness.
 
-This blog post will delve deeper into these evaluation challenges, exploring how traditional metrics fall short and proposing a comprehensive methodology for effective evaluation of LLM-powered LOB chatbots. We'll present a practical framework that balances the flexibility of natural language with the precision required for business operations, and demonstrate how you can easily adapt this approach to your specific scenarios using our reference implementation and GitHub Copilot. By the end, you'll have both the conceptual understanding and practical tools needed to confidently deploy and continuously improve your enterprise conversational AI solutions.
+This blog post will delve deeper into these evaluation challenges, exploring how traditional metrics fall short and proposing a comprehensive methodology for effective evaluation of LOB agents. We'll present a practical framework that balances the flexibility of natural language with the precision required for business operations, and demonstrate how you can easily adapt this approach to your specific scenarios using our reference implementation and GitHub Copilot. By the end, you'll have both the conceptual understanding and practical tools needed to confidently deploy and continuously improve your enterprise conversational AI solutions.
 
 ![LOB Chatbot Demo](./chatbot_demo.gif)
 
@@ -20,11 +20,19 @@ Evaluating conversational AI presents a spectrum of challenges that vary dramati
 
 - **Closed-domain, business-specific agents** — the Line of Business (LOB) chatbots that manage inventory, process orders, or handle employee requests— face a different reality. These systems interact with structured business processes and must deliver precise, reliable outcomes with minimal tolerance for error. Here, evaluation must balance the flexibility of natural language interaction with the rigor of business process execution.
 
-*If you would like to better understand the role of "agents" in conversational AI, I encourage you to check out [building effective agents](https://www.anthropic.com/engineering/building-effective-agents) blog post by Anthropic.*
+---
+*NOTE: You might have noticed we sometimes use `LOB chatbots` and `LOB agents` interchangeably, however there's a small distinction in understanding of these terms:*
+
+- *`LOB chatbot` refers to the overall solution, offering conversational UX for users to interact with internal LOB systems.*
+- *`LOB agent` refers to the LLM-powered component responsible for managing conversations and guiding users through available chat paths, maintaining conversation state and calling the appropriate functions (APIs) to fulfill user tasks.*
+
+*If you would like to better understand the role of `agents` in conversational AI, I encourage you to check out [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) blog post by Anthropic.*
+
+---
 
 ### The Non-Deterministic Evaluation Problem
 
-LLM-based chatbots introduce a fundamental challenge to evaluation: non-determinism. Unlike rule-based systems that produce identical outputs for identical inputs, LLMs incorporate elements of randomness and contextual interpretation that can result in varied—yet equally valid—responses to the same query.
+LLM-based agents introduce a fundamental challenge to evaluation: non-determinism. Unlike rule-based systems that produce identical outputs for identical inputs, LLMs incorporate elements of randomness and contextual interpretation that can result in varied—yet equally valid—responses to the same query.
 
 This non-determinism creates several evaluation hurdles:
 
@@ -33,13 +41,13 @@ This non-determinism creates several evaluation hurdles:
 - **Function calling reliability:** The same user intent might be mapped to different function calls on different runs
 - **Hallucination risk:** Models may confidently present incorrect information or take inappropriate actions
 
-### Why LOB Chatbots Demand Rigorous Evaluation
+### Why LOB Agents Demand Rigorous Evaluation
 
-For general-purpose assistants, occasional errors might be acceptable. For business systems managing inventory, processing payments, or handling sensitive customer data, they are not. Several factors make evaluation especially critical for LOB chatbots:
+For general-purpose assistants, occasional errors might be acceptable. For business systems managing inventory, processing payments, or handling sensitive customer data, they are not. Several factors make evaluation especially critical for LOB agents:
 
 1. **Business process integrity**: Errors can disrupt critical workflows
 2. **Compliance requirements**: Many industries face strict regulatory oversight
-3. **System integrations**: Chatbots must reliably interact with multiple backend systems
+3. **System integrations**: Agents must reliably interact with multiple backend systems
 4. **Financial implications**: Mistakes can directly impact revenue and costs
 5. **Employee and customer trust**: Consistent performance builds essential confidence
 
@@ -52,11 +60,11 @@ The gap between traditional metrics and the needs of modern LLM-based LOB applic
 - Account for the complexity of multi-turn conversations and complex business processes
 - Scale to enterprise needs while providing actionable insights for improvement
 
-In the following sections, we'll share our journey building an end-to-end evaluation framework for LLM-powered LOB chatbots, the technical challenges we overcame, and the methodology we developed to ensure these powerful but complex systems deliver reliable business value.
+In the following sections, we'll share our journey building an end-to-end evaluation framework for LLM-powered LOB agents, the technical challenges we overcame, and the methodology we developed to ensure these powerful but complex systems deliver reliable business value.
 
-## LOB Chatbot Evaluation Framework
+## LOB Agents Evaluation Framework
 
-Our team recently worked with one of our customers on developing a LOB chatbot that was designed to replace an internal, legacy tool for change management in their product development process. The tool was hard to maintain, had a very complex UI with a lot of business rules and restrictions, and it also required a lot of expert knowledge from users. Their leadership believed LLM-powered chatbots are the answer for these challenges and they wanted to build one with us. Our task was to prove feasibility and reliability of such solution when deployed at scale. That's where we began considering all of the aforementioned challenges in evaluating such systems. Our primary goal was to run evaluations which would prove overall reliability and provide stakeholders with enough confidence in this solution. With that in mind, we designed and implemented an evaluation framework for LLM-powered, LOB chatbots.
+Our team recently worked with one of our customers on developing a LOB chatbot that was designed to replace an internal, legacy tool for change management in their product development process. The tool was hard to maintain, had a very complex UI with a lot of business rules and restrictions, and it also required a lot of expert knowledge from users. Their leadership believed LLM-powered chatbots are the answer for these challenges and they wanted to build one with us. Our task was to prove feasibility and reliability of such solution when deployed at scale. That's where we began considering all of the aforementioned challenges in evaluating such systems. Our primary goal was to run evaluations which would prove overall reliability and provide stakeholders with enough confidence in this solution. With that in mind, we designed and implemented an evaluation framework for LLM-powered, LOB agents.
 
 The evaluation framework diagram below illustrates the architecture of our approach, highlighting its key components and their interactions. We designed it to address the unique challenges of evaluating LOB chatbots, ensuring scalability, reproducibility, and actionable insights. We implemented this framework and shared it in a generalized way along with a demo LOB chatbot for a fake scenario of support tickets management. You can find it here: https://github.com/marcgs/lob-chatbot-sample
 
