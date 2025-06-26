@@ -55,15 +55,15 @@ lint: ## 🕵️‍♂️ Run python linter
 
 chatbot: ## 🤖 Start the Support Ticket Management Chatbot
 	@echo "🤖 Starting the Support Ticket Management Chatbot..."
-	@uv run app/chatbot/ui.py
+	@PYTHONPATH=. uv run app/chatbot/ui.py
 
 chatbot-simulation: clear-cache ## 🚀 Start a simulated conversation with the Support Ticket Management Chatbot
 	@echo "🚀 Starting the simulation..."
-	@uv run evaluation/chatbot/simulation/chat_simulator.py
+	@PYTHONPATH=. uv run evaluation/chatbot/simulation/chat_simulator.py
 
 chatbot-eval: clear-cache ## 📊 Evaluate the Support Ticket Management Chatbot
 	@echo "📊 Evaluating the Support Ticket Management Chatbot..."
-	@uv run evaluation/chatbot/evaluate.py
+	@PYTHONPATH=. uv run evaluation/chatbot/evaluate.py
 
 dataset-create: ## 🏗️ Generate chatbot evaluation dataset from templates and dummy data
 	@echo "🏗️ Generating chatbot evaluation dataset..."
