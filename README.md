@@ -31,7 +31,7 @@ Refer to the [evaluation](./docs/evaluation/README.md) documentation for more in
 
 2. Once your model is ready, create an `.env` file by copying `.env.template` and replacing values with your configuration.
 
-3. Open this project with Visual Studio Code using the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers). This will ensure all dependencies are correctly installed in an isolated environment.
+3. Open this project with Visual Studio Code using the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers). This will ensure all dependencies are correctly installed in an isolated environment. (Alternatively, if you'd like to run the project on your local machine, and manually create a virtual Python env, change the following `.env` file var to `PYTHONPATH=.`, then run `make install`)
 
 ## Running the Sample
 
