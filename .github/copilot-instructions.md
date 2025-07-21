@@ -1,42 +1,3 @@
-## Guidelines for Creating or Updating a Plan
-
-- When creating a plan, organize it into numbered phases (e.g., "Phase 1: Setup Dependencies")
-- Break down each phase into specific tasks with numeric identifiers (e.g., "Task 1.1: Add Dependencies")
-- Please only create one document per plan
-- Mark phases and tasks as `- [ ]` while not complete and `- [x]` once completed
-- End the plan with success criteria that define when the implementation is complete
-- Plans that you produce should go under `docs/plans`
-- Use a consistent naming convention `YYYYMMDD-<short-description>.md` for plan files
-
-## Guidelines for Implementing a Plan
-
-- Always prefer the latest Python 3.11 syntax and language features. Avoid deprecated patterns and legacy syntax, especially in type annotations and built-in generics.
-- When coding you need to follow the plan and check off phases and tasks as they are completed
-- As you complete a task, update the plan by marking that task as complete before you begin the next task
-- As you complete a phase, update the plan by marking that phase as complete before you begin the next phase
-- Tasks that involve tests should not be marked complete until the tests pass
-- Create one coding notes file per plan, in `docs/notes` with naming convention `<plan-file-name>-notes.md`
-  - Include a link to the plan file
-- When you complete implementation for a plan phase, create a notes entry in the notes file for the plan and summarize the completed work as follows:
-
-```markdown
-## Phase <phase-number>: <phase-name>
-- Completed on: <current UTC date and time>
-- Completed by: <name of the person who completed the phase, not Copilot>
-
-### Major files added, updated, removed
-<list of files and brief summary of changes>
-
-### Major features added, updated, removed
-<list of features and brief summary of changes>
-
-### Patterns, abstractions, data structures, algorithms, etc.
-<list of patterns, abstractions, data structures, algorithms, etc. and brief summary of changes>
-
-### Governing design principles
-<list of design principles and brief summary of changes>
-```
-
 ## Python Coding Guidelines
 
 ### Use `|` instead of `Union`
@@ -161,4 +122,29 @@ if isinstance(bar, list):
     for item in bar:
         assert isinstance(item, int)
         print(item * 2)
+```
+
+## React Coding Guidelines
+
+- Create fully functional React components.
+- Mark with `export default function Component() { ... }` to match the expected usage.
+- Use Tailwind classes for additional styling.
+- Use `import { Button } from '@/components/ui/button'` or other shadcn/ui imports as needed.
+- Use `import { IconName } from 'lucide-react'` if you want to embed an icon.
+- Include `"use client";` at the top of the file for any component that:
+  - Uses React hooks (useState, useEffect, etc.)
+  - Has interactivity (event handlers, form submissions)
+  - Uses browser-only APIs
+  - Imports other client components
+  - Do not include it for purely static components that only render UI without interaction
+  - Break into multiple files when explicitly prompted or when the task complexity requires separation for clarity.
+  - Favor medium-density layouts and generous spacing to encourage a modern, clean aesthetic by default. Use responsive design patterns consistently.
+- For images, you may use `/placeholder.svg?height=HEIGHT&width=WIDTH` as placeholders.
+- Create folders for new components or pages depending on what the user is asking to prototype. We already have a components folder, so you can create a new folder inside it for the component. If the user is asking for a page, create a new folder inside the `app` directory.
+
+Here's how you can import shadcn components:
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 ```

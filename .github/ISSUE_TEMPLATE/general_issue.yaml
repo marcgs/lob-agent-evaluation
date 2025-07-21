@@ -1,0 +1,39 @@
+name: General Issue
+description: Use this template to create issues with a structured form
+labels: ["experimentation"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Description
+      description: |
+        Briefly describe the problem, feature request, or enhancement. What is the goal or motivation behind this issue?
+      placeholder: Describe the issue here...
+    validations:
+      required: true
+  - type: textarea
+    id: implementation
+    attributes:
+      label: ⚙️ Implementation Details
+      description: |
+        Provide any relevant technical information, suggestions, or context that may help during implementation.
+
+        You can include:
+        - Technologies or components involved
+        - Links to related code, documentation, or designs
+        - Potential risks or constraints
+      placeholder: Add implementation details...
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: ✅ Acceptance Criteria
+      description: |
+        List the requirements that must be met for this issue to be considered complete
+      placeholder: |
+        - [ ] Requirement 1
+        - [ ] Requirement 2
+        - [ ] Requirement 3
+    validations:
+      required: true
