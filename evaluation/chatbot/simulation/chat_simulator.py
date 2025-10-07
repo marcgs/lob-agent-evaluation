@@ -1,14 +1,6 @@
 import asyncio
 
-from semantic_kernel.contents import ChatHistory, ChatMessageContent
-from semantic_kernel.agents import (
-    ChatCompletionAgent,
-    ChatHistoryAgentThread,
-    AgentResponseItem,
-)
-from semantic_kernel.agents.strategies import KernelFunctionTerminationStrategy
-from semantic_kernel.contents.function_call_content import FunctionCallContent
-from semantic_kernel.contents.utils.author_role import AuthorRole
+from agent_framework import ChatAgent, ChatMessage
 
 from app.chatbot.factory import create_support_ticket_agent
 from evaluation.chatbot.models import FunctionCall
@@ -26,7 +18,7 @@ class SupportTicketChatSimulator:
         self,
         instructions: str,
         task_completion_condition: str,
-    ) -> ChatHistory:
+    ) -> list[ChatMessage]:
         """
         This method simulates a conversation between a user and a support ticket agent.
 
@@ -35,84 +27,68 @@ class SupportTicketChatSimulator:
             task_completion_condition (str): Condition to determine if the task is complete.
         """
         
-        support_ticket_agent: ChatCompletionAgent = create_support_ticket_agent(
+        support_ticket_agent: ChatAgent = create_support_ticket_agent(
             name="SupportTicketAgent"
         )
-        user_agent: ChatCompletionAgent = create_user_agent(
+        user_agent: ChatAgent = create_user_agent(
             name="UserAgent", instructions=instructions
         )
-        termination_strategy: KernelFunctionTerminationStrategy = (
-            create_termination_strategy(
-                task_completion_condition=task_completion_condition
-            )
+        termination_strategy = create_termination_strategy(
+            task_completion_condition=task_completion_condition
         )
 
-        # The agent thread is used to make sure the support ticket agent retains the full context of the conversation
-        # it also contains the function calls made by the chatbot and is then returned for evaluation purposes
-        agent_thread: ChatHistoryAgentThread = ChatHistoryAgentThread(
-            thread_id="ChatSimulatorAgentThread"
-        )
-        # The user thread is used to make sure user agent retains the full context of the conversation
-        # it's separated from the agent thread to avoid exposing tool calls and other messages to the user agent
-        user_thread: ChatHistoryAgentThread = ChatHistoryAgentThread(
-            thread_id="ChatSimulatorUserThread"
-        )
+        # Store conversation history manually since Agent Framework handles threads differently
+        conversation_history: list[ChatMessage] = []
 
-        # Initial system message coming to have the Support Ticket Agent start the conversation
-        user_message: ChatMessageContent = ChatMessageContent(
-            content="Starting the simulation", role=AuthorRole.SYSTEM, name="system"
-        )
+        # Initial system message to start the conversation
+        user_message_text = "Starting the simulation"
 
         while True:
-            agent_message: AgentResponseItem[ChatMessageContent] = await support_ticket_agent.get_response(
-                messages=user_message, thread=agent_thread
+            # Get response from support ticket agent using Agent Framework
+            agent_response = await support_ticket_agent.run(user_message_text)
+            agent_message = ChatMessage(
+                role="assistant", 
+                text=agent_response.text
             )
+            conversation_history.append(agent_message)
 
-            print(f"Support Ticket Agent: {agent_message.to_dict()}")
+            print(f"Support Ticket Agent: {agent_message.text}")
 
-            user_response = await user_agent.get_response(
-                messages=agent_message.content, thread=user_thread
+            # Get response from user agent
+            user_response = await user_agent.run(agent_message.text)
+            user_message = ChatMessage(
+                role="user", 
+                text=user_response.text
             )
-
-            # Set the role to user for the support ticket agent to think it is a user message
-            user_message = user_response.content
-            user_message = ChatMessageContent(
-                content=user_message.content,
-                role=AuthorRole.USER,
-                name=user_message.name
-            )
+            conversation_history.append(user_message)
             
-            print(f"User: {user_message.to_dict()}")
+            print(f"User: {user_message.text}")
 
-            # Convert to list of messages to satisfy the type checker
-            messages_list = await agent_thread.get_messages()
-            # # Convert ChatHistory to list[ChatMessageContent] to solve type compatibility issue
+            # Check termination condition
             should_agent_terminate = await termination_strategy.should_agent_terminate(
                 agent=support_ticket_agent,
-                history=[msg for msg in messages_list], # list comprehension required for resolving type compatibility
+                history=conversation_history,
             )
 
             if should_agent_terminate:
                 print("Task completed")
                 break
 
-        history = await agent_thread.get_messages()
+            # Set up next iteration
+            user_message_text = user_message.text
 
-        return history
+        return conversation_history
 
-    def get_function_calls(self, chatHistory: ChatHistory) -> list[FunctionCall]:
+    def get_function_calls(self, chat_history: list[ChatMessage]) -> list[FunctionCall]:
         """
         This method retrieves the function calls made by the chatbot.
         It is used for evaluation purposes only.
+        TODO: Implement proper function call extraction in Phase 5.
         """
 
-        function_calls: list[FunctionCall] = [
-            FunctionCall.from_FunctionCallContent(item)
-                for chatMessageContent in chatHistory 
-                for item in chatMessageContent.items 
-                if isinstance(item, FunctionCallContent)
-        ]
-
+        # Placeholder implementation - will be properly implemented in Phase 5
+        # when we migrate message and content handling
+        function_calls: list[FunctionCall] = []
         return function_calls
 
 

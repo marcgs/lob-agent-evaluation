@@ -22,4 +22,4 @@ class Chatbot:
         # The agent.run() method handles both message processing and returns the response
         response = await self.agent.run(message)
 
-        return str(response)
+        return response.text

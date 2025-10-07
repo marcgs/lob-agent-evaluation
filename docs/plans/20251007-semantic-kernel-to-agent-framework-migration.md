@@ -35,11 +35,11 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 
 ## Phase 4: Invocation and Execution Patterns
 
-- [ ] **Task 4.1:** Update non-streaming calls from `agent.invoke()` to `agent.run()`
-- [ ] **Task 4.2:** Update streaming calls from `agent.invoke_stream()` to `agent.run_stream()`
-- [ ] **Task 4.3:** Update return type handling (`AgentResponseItem` → `AgentRunResponse`)
-- [ ] **Task 4.4:** Simplify response text extraction (use `response.text`)
-- [ ] **Task 4.5:** Remove `KernelArguments` usage (pass parameters directly)
+- [x] **Task 4.1:** Update non-streaming calls from `agent.invoke()` to `agent.run()`
+- [x] **Task 4.2:** Update streaming calls from `agent.invoke_stream()` to `agent.run_stream()`
+- [x] **Task 4.3:** Update return type handling (`AgentResponseItem` → `AgentRunResponse`)
+- [x] **Task 4.4:** Simplify response text extraction (use `response.text`)
+- [x] **Task 4.5:** Remove `KernelArguments` usage (pass parameters directly)
 
 ## Phase 5: Message and Content Handling
 
