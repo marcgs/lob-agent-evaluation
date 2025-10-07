@@ -9,7 +9,7 @@ dependencies = [
     "gradio>=5.20.1",
     "pyright>=1.1.400",
     "python-dotenv>=1.0.1",
-    "semantic-kernel>=1.26.1",
+    "agent-framework==1.0.0b251001",
     "psycopg>=3.2.6",
     "pytest>=8.3.5",
     "pytest-mock>=3.14.0",

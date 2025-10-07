@@ -10,10 +10,10 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 
 ## Phase 1: Setup and Dependencies
 
-- [ ] **Task 1.1:** Update `pyproject.toml` to replace `semantic-kernel` with `agent-framework`
-- [ ] **Task 1.2:** Run `uv lock` to update `uv.lock` with new dependencies
-- [ ] **Task 1.3:** Test dependency installation and resolve any conflicts
-- [ ] **Task 1.4:** Review Agent Framework documentation and migration samples
+- [x] **Task 1.1:** Update `pyproject.toml` to replace `semantic-kernel` with `agent-framework`
+- [x] **Task 1.2:** Run `uv lock` to update `uv.lock` with new dependencies
+- [x] **Task 1.3:** Test dependency installation and resolve any conflicts
+- [x] **Task 1.4:** Review Agent Framework documentation and migration samples
 
 ## Phase 2: Core Agent Infrastructure Migration
 
