@@ -1,25 +1,17 @@
 import logging
-from typing_extensions import Annotated
-from semantic_kernel.functions import kernel_function
+from typing import Annotated
 
-logger = logging.getLogger("kernel")
+logger = logging.getLogger("agent")
 
 
 class CommonPlugin:
     """Common tasks for support ticket management system"""
 
-    @kernel_function(
-        name="start_over",
-        description="Starts a new support ticket management session",
-    )
     def start_over(self) -> str:
+        """Starts a new support ticket management session"""
         logger.info("Executing: start_over")
         return "Let's start over with your support ticket request. How can I help you today?"
 
-    @kernel_function(
-        name="summarize_ticket_details",
-        description="Provides a summary of the support ticket details the user has provided so far.",
-    )
     def summarize_ticket_details(
         self,
         title: Annotated[str | None, "The title of the support ticket."] = None,
@@ -27,6 +19,7 @@ class CommonPlugin:
         priority: Annotated[str | None, "The priority level of the ticket."] = None,
         description: Annotated[str | None, "The description of the issue."] = None,
     ) -> str:
+        """Provides a summary of the support ticket details the user has provided so far."""
         logger.info("Executing: summarize_ticket_details")
 
         summary = "Here's a summary of your support ticket so far:\n\n"
@@ -48,10 +41,6 @@ class CommonPlugin:
 
         return summary
 
-    @kernel_function(
-        name="explain_workflow",
-        description="Explains the workflow for ticket management to the user.",
-    )
     def explain_workflow(
         self,
         workflow_type: Annotated[
@@ -59,6 +48,7 @@ class CommonPlugin:
             "The type of workflow to explain. Must be one of ['Standard', 'Expedited'].",
         ] = "Standard",
     ) -> str:
+        """Explains the workflow for ticket management to the user."""
         logger.info(f"Explaining workflow: {workflow_type}")
 
         if workflow_type == "Standard":

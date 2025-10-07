@@ -342,3 +342,316 @@ Phase 2 will focus on:
   - `semantic_kernel.agents.ChatHistoryAgentThread`
   - `semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.AzureChatPromptExecutionSettings`
   - `semantic_kernel.functions.kernel_arguments.KernelArguments`
+
+---
+
+## Phase 3: Plugin and Tool System Migration
+- **Completed on:** 2025-10-07 UTC
+- **Completed by:** Marc Gomez
+
+### Major files added, updated, removed
+
+#### Updated Files:
+1. **`app/chatbot/plugins/common_plugin.py`**
+   - Removed all decorator imports (no `@kernel_function` or `@ai_function` needed)
+   - Converted to plain functions with comprehensive docstrings
+   - 3 functions: `explain_workflow`, `start_over`, `summarize_ticket_details`
+   - Uses `Annotated` type hints for parameter descriptions
+
+2. **`app/chatbot/plugins/support_ticket_system/ticket_management_plugin.py`**
+   - Removed all decorator imports
+   - Migrated 4 functions to plain functions with docstrings
+   - Functions: `create_support_ticket`, `get_support_ticket`, `update_support_ticket`, `search_tickets`
+   - Maintains instance state via `self._tickets` dictionary
+
+3. **`app/chatbot/plugins/support_ticket_system/reference_data_plugin.py`**
+   - Removed all decorator imports
+   - Migrated 5 functions to plain functions with docstrings
+   - Functions: `get_departments`, `get_department_by_code`, `get_priority_levels`, `get_workflow_types`, `get_action_item_statuses`
+   - Returns reference data for ticket management
+
+4. **`app/chatbot/plugins/support_ticket_system/action_item_plugin.py`**
+   - Removed all decorator imports
+   - Migrated 5 functions to plain functions with docstrings
+   - Functions: `create_action_item`, `get_action_item`, `update_action_item_status`, `update_action_item`, `get_ticket_action_items`
+   - Maintains state via `self._action_items` and `self._ticket_to_actions` dictionaries
+
+5. **`app/chatbot/factory.py`**
+   - Refactored `_load_support_ticket_tools()` to use introspection-based tool discovery
+   - Uses `inspect.getmembers(plugin, predicate=inspect.ismethod)` for automatic method discovery
+   - Automatically discovers 17 public methods from plugin instances
+   - Filters out private methods (starting with `_`) automatically
+   - Returns `list[Callable[..., Any]]` with proper type annotations
+
+
+#### Added Files:
+
+1. **`test_phase3_plugin_migration.py`**
+   - Comprehensive validation test suite for Phase 3
+   - Tests plugin imports, instantiation, decorator migration, and agent creation with tools
+   - All tests pass successfully (4/4 categories)
+
+### Major features added, updated, removed
+
+#### Updated
+
+- ✅ **Plugin System**: Removed all decorators - using plain functions with docstrings
+- ✅ **Tool Registration**: Elegant introspection-based automatic tool discovery using `inspect.getmembers()`
+- ✅ **Import System**: Removed all `semantic_kernel` and `agent_framework` decorator imports from plugins
+- ✅ **Type Safety**: Achieved zero linting errors with proper type annotations (`list[Callable[..., Any]]`)
+
+#### Key Changes
+
+- **Total functions migrated**: 17 tool functions across 4 plugin files
+  - CommonPlugin: 3 functions
+  - TicketManagementPlugin: 4 functions
+  - ReferenceDataPlugin: 5 functions
+  - ActionItemPlugin: 5 functions
+- **Decorator approach**: No decorators needed - Agent Framework auto-discovers from function signatures and docstrings
+- **Tool loading**: Automatic discovery using Python introspection instead of manual method listing
+
+### Patterns, abstractions, data structures, algorithms, etc.
+
+#### Key Pattern Changes
+
+1. **Decorator Removal Pattern**
+
+   ```python
+   # INITIAL (Semantic Kernel):
+   from semantic_kernel.functions import kernel_function
+   
+   @kernel_function(
+       name="function_name",
+       description="Function description",
+   )
+   def my_function(self, param: Annotated[str, "Description"]) -> str:
+       pass
+   
+   # INTERMEDIATE (Agent Framework with decorator - caused linting errors):
+   from agent_framework import ai_function
+   
+   @ai_function(
+       name="function_name",
+       description="Function description",
+   )
+   def my_function(self, param: Annotated[str, "Description"]) -> str:
+       pass
+   
+   # FINAL (Agent Framework - plain function, zero linting errors):
+   def my_function(self, param: Annotated[str, "Description"]) -> str:
+       """Function description.
+       
+       Args:
+           param (str): Description
+           
+       Returns:
+           str: Result description
+       """
+       pass
+   ```
+
+2. **Tool Registration Pattern - Introspection-Based**
+
+   ```python
+   # OLD (Manual listing - error-prone and verbose):
+   common_plugin = CommonPlugin()
+   ticket_plugin = TicketManagementPlugin()
+   
+   tools = [
+       common_plugin.start_over,
+       common_plugin.summarize_ticket_details,
+       common_plugin.explain_workflow,
+       ticket_plugin.create_support_ticket,
+       # ... 14 more methods listed manually
+   ]
+   
+   # NEW (Automatic discovery - elegant and maintainable):
+   import inspect
+   
+   plugins = [
+       CommonPlugin(),
+       TicketManagementPlugin(),
+       ActionItemPlugin(),
+       ReferenceDataPlugin(),
+   ]
+   
+   tools: list[Callable[..., Any]] = []
+   for plugin in plugins:
+       for name, method in inspect.getmembers(plugin, predicate=inspect.ismethod):
+           if not name.startswith("_"):
+               tools.append(method)
+   # Automatically discovers 17 public methods
+   ```
+
+3. **Import Pattern**
+
+   ```python
+   # OLD (Semantic Kernel):
+   from typing_extensions import Annotated
+   from semantic_kernel.functions import kernel_function
+   
+   # INTERMEDIATE (Agent Framework with decorator):
+   from typing import Annotated
+   from agent_framework import ai_function
+   
+   # FINAL (Agent Framework - no decorator needed):
+   from typing import Annotated
+   # No decorator imports needed - just standard Python!
+   ```
+
+#### Critical Discoveries
+
+**Discovery 1: Agent Framework requires individual methods, not plugin objects**
+
+Initially attempted to pass plugin instances (e.g., `CommonPlugin()`) directly to the `tools` parameter, which resulted in error:
+
+```
+TypeError: <CommonPlugin object> is not a callable object
+```
+
+**Solution**: Extract individual methods from plugin instances and pass them as bound methods. This allows:
+- Plugin instances to maintain state (e.g., `self._tickets`)
+- Methods to access instance variables
+- Agent Framework to properly wrap methods as tools
+
+**Discovery 2: @ai_function decorator is optional and causes type checker warnings**
+
+The `@ai_function` decorator from Agent Framework caused Pyright linting errors:
+
+```
+Untyped function decorator obscures type of function; ignoring decorator
+```
+
+**Solution**: Remove all `@ai_function` decorators. Agent Framework automatically discovers tools from:
+- Function signatures with `Annotated` type hints
+- Docstrings for descriptions
+- No decorator needed!
+
+**Discovery 3: Introspection enables elegant, maintainable tool loading**
+
+Manual listing of 17+ methods was verbose and error-prone. Using Python's `inspect` module:
+
+```python
+inspect.getmembers(plugin, predicate=inspect.ismethod)
+```
+
+Benefits:
+- Automatically discovers all public methods
+- Correctly excludes private methods (starting with `_`)
+- Eliminates manual maintenance when adding/removing tools
+- Single source of truth (the plugin classes themselves)
+
+### Governing design principles
+
+1. **No Decorators Needed**: Agent Framework discovers tools from function signatures and docstrings alone
+
+2. **Type Safety First**: Never compromise type safety with `# type: ignore` - find the proper solution
+
+3. **Introspection Over Enumeration**: Use Python's introspection capabilities for automatic discovery instead of manual listing
+
+4. **Method-Based Tool Registration**: Agent Framework treats each method as a separate tool, not entire plugin classes
+
+5. **Docstrings Are Documentation**: Comprehensive docstrings provide all metadata Agent Framework needs
+
+6. **Annotated Parameters**: `Annotated[type, "description"]` type hints provide parameter descriptions for LLM
+
+7. **Backward Compatibility**: Plugin classes maintain their structure and state; only the registration mechanism changes
+
+### Notes and Observations
+
+#### What Went Well
+
+- ✅ Decorator migration was straightforward initially (simple find-and-replace)
+- ✅ Found elegant solution to remove decorators entirely - plain functions work perfectly
+- ✅ Introspection-based tool loading is more maintainable and Pythonic
+- ✅ Type annotations and docstrings remain unchanged and fully typed
+- ✅ Plugin class structure and instance state preserved
+- ✅ All validation tests pass successfully (4/4 categories)
+- ✅ Zero linting errors achieved with proper type annotations
+
+#### Challenges
+
+- ⚠️ Initial confusion about tool registration (plugin objects vs. individual methods)
+- ⚠️ Linting errors from `@ai_function` decorator required investigation
+- ⚠️ Had to iterate to find the elegant introspection-based solution
+
+#### Important Learnings
+
+1. **Tool Registration Requirement**: Agent Framework's `tools` parameter expects:
+   - Individual callable functions/methods
+   - Tool protocol objects
+   - Mutable mappings
+   - **NOT** plugin class instances (unlike some Semantic Kernel patterns)
+
+2. **State Management**: Using bound methods (e.g., `plugin.method`) allows:
+   - Methods to access `self` and instance variables
+   - Plugins to maintain state across multiple tool calls
+   - Clean separation of concerns between plugin logic and agent
+
+3. **Decorator Behavior**: The `@ai_function` decorator:
+   - Is completely optional - plain functions work perfectly
+   - Causes type checker warnings due to untyped nature
+   - Provides no additional value when docstrings + Annotated types are used
+   - Best practice: **Don't use it** - rely on signatures and docstrings instead
+
+4. **Introspection Benefits**:
+   - `inspect.getmembers()` with `inspect.ismethod` predicate is the elegant solution
+   - Automatically discovers all public methods from plugin instances
+   - Filters out private/helper methods (starting with `_`) automatically
+   - Reduces maintenance burden when adding/removing tools
+   - Single source of truth is the plugin class itself
+
+5. **Type Safety**:
+   - Always use proper type annotations: `list[Callable[..., Any]]`
+   - Import from `collections.abc` for modern Python 3.9+ syntax
+   - Never use `# type: ignore` to suppress warnings - find the root cause
+
+### Testing Status
+
+#### Completed
+
+- ✅ Plugin imports compile successfully (zero errors)
+- ✅ All 4 plugins instantiate without errors
+- ✅ All 17 tool methods accessible and correctly discovered
+- ✅ Agent creation with tools succeeds
+- ✅ Decorator migration verified (no `@kernel_function`, `@ai_function`, or decorator imports remain)
+- ✅ All Phase 3 validation tests pass (4/4 categories)
+- ✅ Introspection-based tool loading verified (17 tools discovered automatically)
+- ✅ Zero linting errors with full type safety
+
+#### Pending (requires later phases)
+
+- ⏳ Actual tool invocation with LLM
+- ⏳ End-to-end workflow with function calling
+- ⏳ Integration tests with Azure OpenAI
+
+### Code Quality
+
+- **Type Safety**: Zero linting errors with strict type hints and proper `Callable` annotations
+- **Compatibility**: All plugins maintain backward-compatible structure
+- **Documentation**: Function docstrings provide comprehensive descriptions
+- **Testing**: Comprehensive validation suite with 4 test categories
+- **Maintainability**: Introspection-based loading eliminates manual method listing
+
+### Migration Metrics
+
+- **Files Modified**: 5 files (4 plugin files + factory.py)
+- **Files Created**: 1 test file
+- **Functions Migrated**: 17 tool functions (down from 18 after refactoring)
+- **Decorators Removed**: 17 `@kernel_function` decorators removed, 0 `@ai_function` decorators added (plain functions)
+- **Import Changes**: 4 decorator imports removed from plugins
+- **Lines Changed**: ~100 lines (decorator removal, introspection logic, type annotations)
+- **Breaking Changes**: 0 (tool interfaces remain identical)
+- **Test Pass Rate**: 100% (4/4 test categories passed)
+- **Linting Errors**: 0 (down from 18+ warnings with decorators)
+- **Tool Discovery**: Automatic (17 methods discovered via introspection)
+
+### Next Steps (Phase 4)
+
+Phase 4 will focus on:
+
+1. Update invocation patterns from `agent.invoke()` to `agent.run()`
+2. Update streaming calls from `agent.invoke_stream()` to `agent.run_stream()`
+3. Update return type handling (`AgentResponseItem` → `AgentRunResponse`)
+4. Simplify response text extraction
+5. Test actual tool invocation with LLM

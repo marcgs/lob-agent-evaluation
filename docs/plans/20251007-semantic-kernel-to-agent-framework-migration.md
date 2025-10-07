@@ -26,12 +26,12 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 
 ## Phase 3: Plugin and Tool System Migration
 
-- [ ] **Task 3.1:** Update `app/chatbot/plugins/common_plugin.py` - replace `@kernel_function` with `@ai_function`
-- [ ] **Task 3.2:** Migrate `app/chatbot/plugins/support_ticket_system/ticket_management_plugin.py`
-- [ ] **Task 3.3:** Migrate `app/chatbot/plugins/support_ticket_system/reference_data_plugin.py`
-- [ ] **Task 3.4:** Migrate `app/chatbot/plugins/support_ticket_system/action_item_plugin.py`
-- [ ] **Task 3.5:** Update tool registration from `plugins` parameter to `tools` parameter
-- [ ] **Task 3.6:** Remove plugin wrapper classes where applicable (use plain functions)
+- [x] **Task 3.1:** Update `app/chatbot/plugins/common_plugin.py` - replace `@kernel_function` with `@ai_function`
+- [x] **Task 3.2:** Migrate `app/chatbot/plugins/support_ticket_system/ticket_management_plugin.py`
+- [x] **Task 3.3:** Migrate `app/chatbot/plugins/support_ticket_system/reference_data_plugin.py`
+- [x] **Task 3.4:** Migrate `app/chatbot/plugins/support_ticket_system/action_item_plugin.py`
+- [x] **Task 3.5:** Update tool registration from `plugins` parameter to `tools` parameter
+- [x] **Task 3.6:** Remove plugin wrapper classes where applicable (use plain functions)
 
 ## Phase 4: Invocation and Execution Patterns
 

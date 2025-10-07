@@ -1,4 +1,6 @@
+import inspect
 import os
+from collections.abc import Callable
 from typing import Any
 from agent_framework import ChatAgent
 from agent_framework.azure import AzureOpenAIChatClient
@@ -71,11 +73,15 @@ def _load_support_ticket_instructions() -> str:
         return instructions
 
 
-def _load_support_ticket_tools() -> list[Any]:
+def _load_support_ticket_tools() -> list[Callable[..., Any]]:
     """
     Load the support ticket management tools (plugins converted to tools).
+    
+    Automatically discovers all public methods from plugin instances.
+    Methods starting with '_' are considered private and excluded.
+    
     Returns:
-        list[Any]: A list of tool instances (plugin objects).
+        list[Callable[..., Any]]: A list of tool methods from plugin instances.
     """
     from app.chatbot.plugins.common_plugin import CommonPlugin
     from app.chatbot.plugins.support_ticket_system.ticket_management_plugin import (
@@ -88,11 +94,21 @@ def _load_support_ticket_tools() -> list[Any]:
         ReferenceDataPlugin,
     )
 
-    # Return plugin instances as tools
-    # Agent Framework will automatically discover methods decorated with @kernel_function/@ai_function
-    return [
+    # Instantiate plugins
+    plugins = [
         CommonPlugin(),
         TicketManagementPlugin(),
         ActionItemPlugin(),
         ReferenceDataPlugin(),
     ]
+
+    # Extract all public methods from each plugin instance
+    # This automatically discovers tool functions without manual listing
+    tools: list[Callable[..., Any]] = []
+    for plugin in plugins:
+        for name, method in inspect.getmembers(plugin, predicate=inspect.ismethod):
+            # Skip private methods (starting with _) and special methods (starting with __)
+            if not name.startswith("_"):
+                tools.append(method)
+
+    return tools

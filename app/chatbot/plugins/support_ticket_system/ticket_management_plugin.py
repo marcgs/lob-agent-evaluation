@@ -3,8 +3,6 @@ import logging
 from datetime import datetime
 from typing import Annotated, Any
 
-from semantic_kernel.functions import kernel_function
-
 from app.chatbot.data_models.ticket_models import (
     SupportTicket,
     TicketPriority,
@@ -21,10 +19,6 @@ class TicketManagementPlugin:
         self._tickets: dict[str, SupportTicket] = TICKETS_BY_ID
         logging.info("Ticket Management Plugin initialized")
 
-    @kernel_function(
-        name="create_support_ticket",
-        description="Creates a new support ticket in the system.",
-    )
     def create_support_ticket(
         self,
         title: Annotated[
@@ -50,6 +44,7 @@ class TicketManagementPlugin:
             bool, "Whether this ticket should be visible to the customer."
         ] = False,
     ) -> dict[str, Any]:
+        """Creates a new support ticket in the system."""
         logging.info("Creating new support ticket")
 
         # Generate a unique ticket ID with "TKT-" prefix
@@ -80,14 +75,11 @@ class TicketManagementPlugin:
             logging.error(f"Failed to create ticket: {str(e)}")
             return {"error": f"Failed to create ticket: {str(e)}"}
 
-    @kernel_function(
-        name="get_support_ticket",
-        description="Retrieves a support ticket by its ID.",
-    )
     def get_support_ticket(
         self,
         ticket_id: Annotated[str, "The unique identifier of the ticket to retrieve."],
     ) -> dict[str, Any]:
+        """Retrieves a support ticket by its ID."""
         logging.info(f"Retrieving ticket: {ticket_id}")
 
         if ticket_id in self._tickets:
@@ -96,10 +88,6 @@ class TicketManagementPlugin:
         else:
             return {"error": f"No ticket found with ID: {ticket_id}"}
 
-    @kernel_function(
-        name="update_support_ticket",
-        description="Updates an existing support ticket in the system.",
-    )
     def update_support_ticket(
         self,
         ticket_id: Annotated[str, "The unique identifier of the ticket to update."],
@@ -119,6 +107,7 @@ class TicketManagementPlugin:
             bool | None, "Whether this ticket should be visible to the customer."
         ] = None,
     ) -> dict[str, Any]:
+        """Updates an existing support ticket in the system."""
         logging.info(f"Updating ticket: {ticket_id}")
 
         if ticket_id not in self._tickets:
@@ -157,10 +146,6 @@ class TicketManagementPlugin:
             "updated_at": ticket.updated_at.isoformat(),
         }
 
-    @kernel_function(
-        name="search_tickets",
-        description="Search for support tickets based on criteria.",
-    )
     def search_tickets(
         self,
         search_query: Annotated[
@@ -169,6 +154,7 @@ class TicketManagementPlugin:
         department_code: Annotated[str | None, "Filter tickets by department code."] = None,
         priority: Annotated[str | None, "Filter tickets by priority level."] = None,
     ) -> dict[str, Any]:
+        """Search for support tickets based on criteria."""
         logging.info(f"Searching tickets with query: {search_query}")
 
         # Start with all tickets
