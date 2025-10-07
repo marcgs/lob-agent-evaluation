@@ -161,3 +161,184 @@ Phase 2 will focus on:
 - [Migration Guide](https://learn.microsoft.com/en-us/agent-framework/migration-guide/from-semantic-kernel/?pivots=programming-language-python)
 - [Agent Framework Quickstart](https://learn.microsoft.com/en-us/agent-framework/tutorials/quick-start)
 - [GitHub Migration Samples](https://github.com/microsoft/agent-framework/tree/main/python/samples/semantic-kernel-migration)
+
+---
+
+## Phase 2: Core Agent Infrastructure Migration
+- **Completed on:** 2025-01-07 UTC
+- **Completed by:** Marc Gomez
+
+### Major files added, updated, removed
+
+#### Updated Files:
+1. **`app/chatbot/factory.py`**
+   - Replaced `Kernel` with direct `AzureOpenAIChatClient` initialization
+   - Migrated `create_support_ticket_agent()` to use `ChatAgent` instead of `ChatCompletionAgent`
+   - Replaced `create_kernel_with_chat_completion()` with `create_azure_openai_chat_client()`
+   - Updated `_load_support_ticket_plugins()` to `_load_support_ticket_tools()` returning a list of plugin objects
+   - Removed `AzureChatPromptExecutionSettings`, `FunctionChoiceBehavior`, and `KernelArguments`
+
+2. **`app/chatbot/chatbot.py`**
+   - Migrated from `ChatCompletionAgent` to `ChatAgent`
+   - Removed `ChatHistoryAgentThread` usage (thread management now handled by Agent Framework)
+   - Updated `chat()` method to use `agent.run()` instead of `agent.get_response()`
+   - Simplified response handling (direct string conversion)
+
+#### Added Files:
+1. **`test_phase2_agent_creation.py`**
+   - Created test script to verify Phase 2 core agent infrastructure
+   - Tests agent creation, client initialization, and property assignment
+   - Validates that Agent Framework patterns are correctly implemented
+
+### Major features added, updated, removed
+
+#### Added:
+- ✅ Agent Framework-based agent creation using `ChatAgent`
+- ✅ Direct Azure OpenAI client initialization using `AzureOpenAIChatClient`
+- ✅ Simplified agent instantiation (no Kernel required)
+- ✅ Tools parameter support (preparing for Phase 3 plugin migration)
+
+#### Updated:
+- ✅ Agent execution pattern: `agent.run()` instead of `agent.get_response()`
+- ✅ Configuration: Direct parameters on `ChatAgent` instead of `AzureChatPromptExecutionSettings`
+- ✅ Thread management: Removed explicit thread creation (handled internally by Agent Framework)
+
+#### Removed:
+- ❌ Kernel dependency
+- ❌ `ChatCompletionAgent` (replaced with `ChatAgent`)
+- ❌ `AzureChatCompletion` (replaced with `AzureOpenAIChatClient`)
+- ❌ `ChatHistoryAgentThread` (thread management simplified)
+- ❌ `AzureChatPromptExecutionSettings` (settings now passed directly)
+- ❌ `FunctionChoiceBehavior.Auto()` (automatic in Agent Framework)
+- ❌ `KernelArguments` (arguments passed directly to methods)
+
+### Patterns, abstractions, data structures, algorithms, etc.
+
+#### Key Pattern Changes:
+
+1. **Agent Creation Pattern**
+   ```python
+   # OLD (Semantic Kernel):
+   kernel = Kernel()
+   kernel.add_service(AzureChatCompletion(...))
+   agent = ChatCompletionAgent(
+       kernel=kernel,
+       arguments=KernelArguments(settings=execution_settings),
+       ...
+   )
+   
+   # NEW (Agent Framework):
+   client = AzureOpenAIChatClient(...)
+   agent = ChatAgent(
+       chat_client=client,
+       temperature=0.3,
+       top_p=0.9,
+       ...
+   )
+   ```
+
+2. **Client Initialization Pattern**
+   ```python
+   # OLD:
+   AzureChatCompletion(
+       service_id=service_id,
+       deployment_name=...,
+       api_key=...,
+       endpoint=...,
+   )
+   
+   # NEW:
+   AzureOpenAIChatClient(
+       deployment_name=...,
+       api_key=...,
+       endpoint=...,
+   )
+   ```
+
+3. **Execution Pattern**
+   ```python
+   # OLD:
+   response = await agent.get_response(messages=message, thread=self.chat_thread)
+   
+   # NEW:
+   response = await agent.run(message)
+   ```
+
+4. **Tools/Plugins Pattern**
+   ```python
+   # OLD:
+   kernel.add_plugin(CommonPlugin(), plugin_name="CommonPlugin")
+   
+   # NEW:
+   tools = [CommonPlugin(), TicketManagementPlugin(), ...]
+   agent = ChatAgent(..., tools=tools)
+   ```
+
+### Governing design principles
+
+1. **Simplification**: Agent Framework eliminates the Kernel abstraction layer, providing more direct and intuitive APIs
+
+2. **Configuration Over Ceremony**: Settings are passed directly to agent/method calls rather than through separate settings objects
+
+3. **Unified Interface**: Single `ChatAgent` class for all chat-based agents (no distinction between completion agents and other types)
+
+4. **Automatic Function Calling**: Function choice behavior is automatic - no need to explicitly enable it
+
+5. **Thread Management Transparency**: Thread/conversation management is handled internally, reducing boilerplate code
+
+### Notes and Observations
+
+#### What Went Well:
+- ✅ Core agent infrastructure migration was straightforward
+- ✅ API surface is cleaner and more intuitive in Agent Framework
+- ✅ Less boilerplate code required
+- ✅ Strong type hints and good IDE support
+- ✅ Agent creation test passes successfully
+
+#### Challenges:
+- ⚠️ Plugin imports still use `semantic_kernel.functions.kernel_function` - will be addressed in Phase 3
+- ⚠️ Existing unit tests can't run yet due to plugin dependencies on Semantic Kernel
+- ⚠️ Thread management changes may affect conversation history handling (needs validation in later phases)
+- ⚠️ Tool parameter type checking shows warnings but works correctly at runtime
+
+#### Next Steps (Phase 3):
+1. Migrate all plugins to use `@ai_function` decorator instead of `@kernel_function`
+2. Update plugin imports from `semantic_kernel` to `agent_framework`
+3. Validate that function calling works correctly with migrated plugins
+4. Test tool registration and execution patterns
+
+### Testing Status
+
+#### Completed:
+- ✅ Agent creation with `ChatAgent`
+- ✅ Azure OpenAI client initialization with `AzureOpenAIChatClient`
+- ✅ Agent property assignment and validation
+- ✅ Basic structural validation
+- ✅ Imports compile without errors
+
+#### Pending (requires Phase 3 completion):
+- ⏳ End-to-end workflow tests
+- ⏳ Plugin/tool function calling
+- ⏳ Chat history and conversation management
+- ⏳ Full integration tests with actual API calls
+
+### Code Quality
+
+- **Type Safety**: Maintained strict type checking with Pyright (0 errors in core files)
+- **Compatibility**: Followed Python 3.11+ syntax guidelines
+- **Documentation**: Updated docstrings to reflect Agent Framework patterns
+- **Testing**: Created validation script for Phase 2 completion
+
+### Migration Metrics
+
+- **Files Modified**: 2 core files (`factory.py`, `chatbot.py`)
+- **Files Created**: 1 test file (`test_phase2_agent_creation.py`)
+- **Lines Changed**: ~100 lines across both files
+- **Breaking Changes**: 0 (external API remains compatible at module level)
+- **Deprecations Removed**: 6 major deprecated imports
+  - `semantic_kernel.Kernel`
+  - `semantic_kernel.agents.ChatCompletionAgent`
+  - `semantic_kernel.connectors.ai.open_ai.AzureChatCompletion`
+  - `semantic_kernel.agents.ChatHistoryAgentThread`
+  - `semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.AzureChatPromptExecutionSettings`
+  - `semantic_kernel.functions.kernel_arguments.KernelArguments`

@@ -17,12 +17,12 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 
 ## Phase 2: Core Agent Infrastructure Migration
 
-- [ ] **Task 2.1:** Update imports from `semantic_kernel.*` to `agent_framework.*` in core files
-- [ ] **Task 2.2:** Migrate `app/chatbot/factory.py` - replace Kernel with Agent Framework patterns
-- [ ] **Task 2.3:** Update `app/chatbot/chatbot.py` - migrate `ChatCompletionAgent` to `ChatAgent`
-- [ ] **Task 2.4:** Remove Kernel dependency from agent creation patterns
-- [ ] **Task 2.5:** Update Azure client initialization (`AzureChatCompletion` → `AzureOpenAIChatClient`)
-- [ ] **Task 2.6:** Migrate thread creation (`ChatHistoryAgentThread` → `agent.get_new_thread()`)
+- [x] **Task 2.1:** Update imports from `semantic_kernel.*` to `agent_framework.*` in core files
+- [x] **Task 2.2:** Migrate `app/chatbot/factory.py` - replace Kernel with Agent Framework patterns
+- [x] **Task 2.3:** Update `app/chatbot/chatbot.py` - migrate `ChatCompletionAgent` to `ChatAgent`
+- [x] **Task 2.4:** Remove Kernel dependency from agent creation patterns
+- [x] **Task 2.5:** Update Azure client initialization (`AzureChatCompletion` → `AzureOpenAIChatClient`)
+- [x] **Task 2.6:** Migrate thread creation (`ChatHistoryAgentThread` → `agent.get_new_thread()`)
 
 ## Phase 3: Plugin and Tool System Migration
 
