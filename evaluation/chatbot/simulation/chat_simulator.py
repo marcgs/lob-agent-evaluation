@@ -40,12 +40,20 @@ class SupportTicketChatSimulator:
         # Store conversation history manually since Agent Framework handles threads differently
         conversation_history: list[ChatMessage] = []
 
+        # The agent thread is used to make sure the support ticket agent retains the full context of the conversation
+        # it also contains the function calls made by the chatbot and is then returned for evaluation purposes
+        agent_thread = support_ticket_agent.get_new_thread()
+
+        # The user thread is used to make sure user agent retains the full context of the conversation
+        # it's separated from the agent thread to avoid exposing tool calls and other messages to the user agent
+        user_thread = user_agent.get_new_thread()
+
         # Initial system message to start the conversation
         user_message_text = "Starting the simulation"
 
         while True:
             # Get response from support ticket agent using Agent Framework
-            agent_response = await support_ticket_agent.run(user_message_text)
+            agent_response = await support_ticket_agent.run(user_message_text, thread=agent_thread)
             
             # Use the messages from the agent response to preserve function call content
             print("-"*100)
@@ -68,7 +76,7 @@ class SupportTicketChatSimulator:
             assistant_text = agent_response.text
 
             # Get response from user agent
-            user_response = await user_agent.run(assistant_text)
+            user_response = await user_agent.run(assistant_text, thread=user_thread)
             user_message = ChatMessage(
                 role=Role.USER, 
                 text=user_response.text
