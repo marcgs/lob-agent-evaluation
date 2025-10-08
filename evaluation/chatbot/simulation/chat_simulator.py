@@ -1,6 +1,6 @@
 import asyncio
 
-from agent_framework import ChatAgent, ChatMessage
+from agent_framework import ChatAgent, ChatMessage, Role
 
 from app.chatbot.factory import create_support_ticket_agent
 from evaluation.chatbot.models import FunctionCall
@@ -46,22 +46,36 @@ class SupportTicketChatSimulator:
         while True:
             # Get response from support ticket agent using Agent Framework
             agent_response = await support_ticket_agent.run(user_message_text)
-            agent_message = ChatMessage(
-                role="assistant", 
-                text=agent_response.text
-            )
-            conversation_history.append(agent_message)
+            
+            # Use the messages from the agent response to preserve function call content
+            print("-"*100)
+            if agent_response.messages:
+                # Add all messages from the response to preserve function calls
+                for message in agent_response.messages:
+                    if message.role == Role.ASSISTANT:  # Only add assistant messages
+                        conversation_history.append(message)
+                        print(f"Support Ticket Agent: {message.text}")
+            else:
+                # Fallback: create a simple message if no messages in response
+                agent_message = ChatMessage(
+                    role=Role.ASSISTANT, 
+                    text=agent_response.text
+                )
+                conversation_history.append(agent_message)
+                print(f"Support Ticket Agent: {agent_message.text}")
 
-            print(f"Support Ticket Agent: {agent_message.text}")
+            # Get the assistant's text for the user response
+            assistant_text = agent_response.text
 
             # Get response from user agent
-            user_response = await user_agent.run(agent_message.text)
+            user_response = await user_agent.run(assistant_text)
             user_message = ChatMessage(
-                role="user", 
+                role=Role.USER, 
                 text=user_response.text
             )
             conversation_history.append(user_message)
             
+            print("-"*100)
             print(f"User: {user_message.text}")
 
             # Check termination condition
@@ -91,8 +105,8 @@ class SupportTicketChatSimulator:
         
         # Iterate through all messages in the chat history
         for message in chat_history:
-            # Check if the message has contents
-            if message.contents:
+            # Check if the message has contents and is from the assistant
+            if message.contents and str(message.role) == "assistant":
                 # Look for FunctionCallContent in the message contents
                 for content in message.contents:
                     if isinstance(content, FunctionCallContent):

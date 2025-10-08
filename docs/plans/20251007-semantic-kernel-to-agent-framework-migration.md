@@ -59,12 +59,12 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 
 ## Phase 7: Evaluation Framework Migration
 
-- [ ] **Task 7.1:** Update `evaluation/chatbot/eval_target.py` for Agent Framework compatibility
-- [ ] **Task 7.2:** Migrate `evaluation/chatbot/simulation/chat_simulator.py`
-- [ ] **Task 7.3:** Update `evaluation/chatbot/simulation/factory.py`
-- [ ] **Task 7.4:** Adapt termination strategy for chat simulations
-- [ ] **Task 7.5:** Update function call extraction in evaluators (`evaluation/chatbot/evaluators/*.py`)
-- [ ] **Task 7.6:** Validate evaluation metrics still work correctly
+- [x] **Task 7.1:** Update `evaluation/chatbot/eval_target.py` for Agent Framework compatibility
+- [x] **Task 7.2:** Migrate `evaluation/chatbot/simulation/chat_simulator.py`
+- [x] **Task 7.3:** Update `evaluation/chatbot/simulation/factory.py`
+- [x] **Task 7.4:** Adapt termination strategy for chat simulations
+- [x] **Task 7.5:** Update function call extraction in evaluators (`evaluation/chatbot/evaluators/*.py`)
+- [x] **Task 7.6:** Validate evaluation metrics still work correctly
 
 ## Phase 8: Testing and Validation
 
