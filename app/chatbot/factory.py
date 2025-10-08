@@ -48,6 +48,7 @@ def create_azure_openai_chat_client() -> AzureOpenAIChatClient:
         deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
         api_key=os.getenv("AZURE_OPENAI_API_KEY"),
         endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
     )
     return client
 

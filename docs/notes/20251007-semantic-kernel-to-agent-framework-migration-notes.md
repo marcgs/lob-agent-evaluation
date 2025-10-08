@@ -1034,3 +1034,37 @@ Phase 6 will focus on:
 3. Simplify function choice behavior configuration
 4. Update temperature, max_tokens, and other settings handling
 5. Review and update environment variable handling
+
+---
+
+## Phase 6: Configuration and Settings Migration
+
+- **Completed on:** 2025-10-08 UTC
+- **Completed by:** Marc Gomez
+
+### Major files updated in Phase 6
+
+- **Updated**: `app/chatbot/factory.py` - Added missing `api_version` parameter to `AzureOpenAIChatClient` constructor
+- **Verified**: All Python files - Confirmed complete removal of `AzureChatPromptExecutionSettings` and `FunctionChoiceBehavior`
+- **Verified**: Environment variable handling - All variables properly configured for Agent Framework
+
+### Major features completed in Phase 6
+
+- **Completed**: Configuration migration from Semantic Kernel settings objects to Agent Framework direct parameters
+- **Verified**: Function choice behavior now automatic in Agent Framework (no explicit configuration needed)
+- **Enhanced**: Azure OpenAI client now includes all required parameters (api_version was missing)
+- **Validated**: Temperature and top_p settings correctly configured on ChatAgent constructor
+
+### Patterns and abstractions in Phase 6
+
+- **Configuration Pattern**: Direct parameter passing to Agent Framework constructors and methods
+- **Environment Pattern**: All environment variables loaded via `os.getenv()` and passed directly to constructors
+- **Agent Framework Pattern**: Settings configured at agent creation time rather than per-invocation
+- **Simplified Configuration**: Eliminated wrapper objects and settings classes in favor of direct parameters
+
+### Design principles for Phase 6
+
+- **Direct Configuration**: Pass configuration parameters directly to Agent Framework constructors and methods
+- **Environment-Driven**: Use environment variables for all deployment-specific configuration
+- **Agent Framework Native**: Leverage Agent Framework's built-in configuration patterns rather than custom wrappers
+- **Simplified Settings**: Avoid complex settings objects in favor of simple parameter passing

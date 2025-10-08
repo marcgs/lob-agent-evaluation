@@ -51,11 +51,11 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 
 ## Phase 6: Configuration and Settings Migration
 
-- [ ] **Task 6.1:** Remove `AzureChatPromptExecutionSettings` usage
-- [ ] **Task 6.2:** Update configuration to pass parameters directly to `run()` method
-- [ ] **Task 6.3:** Simplify function choice behavior configuration
-- [ ] **Task 6.4:** Update temperature, max_tokens, and other settings handling
-- [ ] **Task 6.5:** Review and update environment variable handling
+- [x] **Task 6.1:** Remove `AzureChatPromptExecutionSettings` usage
+- [x] **Task 6.2:** Update configuration to pass parameters directly to `run()` method
+- [x] **Task 6.3:** Simplify function choice behavior configuration
+- [x] **Task 6.4:** Update temperature, max_tokens, and other settings handling
+- [x] **Task 6.5:** Review and update environment variable handling
 
 ## Phase 7: Evaluation Framework Migration
 
