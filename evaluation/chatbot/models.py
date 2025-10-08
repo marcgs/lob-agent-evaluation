@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import json
 from typing import Any
 
-from semantic_kernel.contents.function_call_content import FunctionCallContent
+from agent_framework import FunctionCallContent
 
 
 @dataclass
@@ -15,10 +15,12 @@ class FunctionCall:
         """
         Converts a FunctionCallContent object to a FunctionCall object.
         """
+        # Agent Framework FunctionCallContent already has parsed arguments as dict
+        # but handle the case where it might be a string
         args = json.loads(source.arguments) if isinstance(source.arguments, str) else source.arguments
         
         return FunctionCall(
-            functionName=source.name or source.function_name, # name attribute includes plugin name plus function name. If available, use it.
+            functionName=source.name,  # Agent Framework uses 'name' attribute
             arguments=args, # pyright: ignore [reportArgumentType]
         )
     

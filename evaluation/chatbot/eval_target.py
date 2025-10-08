@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from evaluation.chatbot.simulation.chat_simulator import SupportTicketChatSimulator
-from semantic_kernel.contents import ChatHistory
+from agent_framework import ChatMessage
 
 class SupportTicketEvaluationTarget:
     """
@@ -24,7 +24,7 @@ class SupportTicketEvaluationTarget:
 
         try:
             simulator = SupportTicketChatSimulator()
-            history: ChatHistory = asyncio.get_event_loop().run_until_complete(
+            history: list[ChatMessage] = asyncio.get_event_loop().run_until_complete(
                 simulator.run(
                     instructions=instructions,
                     task_completion_condition=task_completion_condition,
@@ -34,7 +34,7 @@ class SupportTicketEvaluationTarget:
             function_calls = simulator.get_function_calls(history)
 
             return {
-                "chat_history": list(t.to_dict() for t in history),
+                "chat_history": list(msg.to_dict() for msg in history),
                 "function_calls": list(f.to_dict() for f in function_calls),
             }
 

@@ -43,11 +43,11 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 
 ## Phase 5: Message and Content Handling
 
-- [ ] **Task 5.1:** Update `evaluation/chatbot/models.py` - migrate message models
-- [ ] **Task 5.2:** Replace `ChatMessageContent` with `ChatMessage`
-- [ ] **Task 5.3:** Update `FunctionCallContent` to Agent Framework's function call representation
-- [ ] **Task 5.4:** Migrate chat history handling patterns
-- [ ] **Task 5.5:** Update message serialization/deserialization in evaluation models
+- [x] **Task 5.1:** Update `evaluation/chatbot/models.py` - migrate message models
+- [x] **Task 5.2:** Replace `ChatMessageContent` with `ChatMessage`
+- [x] **Task 5.3:** Update `FunctionCallContent` to Agent Framework's function call representation
+- [x] **Task 5.4:** Migrate chat history handling patterns
+- [x] **Task 5.5:** Update message serialization/deserialization in evaluation models
 
 ## Phase 6: Configuration and Settings Migration
 

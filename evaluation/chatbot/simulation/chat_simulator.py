@@ -83,12 +83,23 @@ class SupportTicketChatSimulator:
         """
         This method retrieves the function calls made by the chatbot.
         It is used for evaluation purposes only.
-        TODO: Implement proper function call extraction in Phase 5.
         """
+        from agent_framework import FunctionCallContent
+        from ..models import FunctionCall
 
-        # Placeholder implementation - will be properly implemented in Phase 5
-        # when we migrate message and content handling
         function_calls: list[FunctionCall] = []
+        
+        # Iterate through all messages in the chat history
+        for message in chat_history:
+            # Check if the message has contents
+            if message.contents:
+                # Look for FunctionCallContent in the message contents
+                for content in message.contents:
+                    if isinstance(content, FunctionCallContent):
+                        # Convert Agent Framework FunctionCallContent to our FunctionCall model
+                        function_call = FunctionCall.from_FunctionCallContent(content)
+                        function_calls.append(function_call)
+        
         return function_calls
 
 

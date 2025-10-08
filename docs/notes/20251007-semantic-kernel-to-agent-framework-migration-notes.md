@@ -849,13 +849,188 @@ Phase 4 will focus on:
 - **Lines Changed**: ~150 lines across simulation system
 - **Placeholder Implementations**: 1 (SimpleTerminationStrategy for Phase 7)
 
-### Next Steps (Phase 5)
+## Phase 5: Message and Content Handling
+- **Completed on:** 2025-10-08 UTC
+- **Completed by:** Marc Gomez
 
-Phase 5 will focus on:
+### Major files added, updated, removed
 
-1. Update `evaluation/chatbot/models.py` - migrate message models
-2. Replace `ChatMessageContent` with `ChatMessage` in evaluation system
-3. Update `FunctionCallContent` to Agent Framework's function call representation  
-4. Implement proper function call extraction in `get_function_calls()` method
-5. Migrate chat history handling patterns in evaluation framework
-6. Update message serialization/deserialization in evaluation models
+#### Updated Files:
+- `evaluation/chatbot/models.py`: Migrated `FunctionCallContent` import from Semantic Kernel to Agent Framework
+- `evaluation/chatbot/simulation/chat_simulator.py`: Implemented proper function call extraction in `get_function_calls()` method
+- `evaluation/chatbot/evaluate.py`: Removed Semantic Kernel logging dependency
+- `evaluation/chatbot/eval_target.py`: Replaced `ChatHistory` with `list[ChatMessage]`
+
+#### Key Migration Changes:
+**Import Updates:**
+- `semantic_kernel.contents.function_call_content.FunctionCallContent` → `agent_framework.FunctionCallContent`
+- `semantic_kernel.contents.ChatHistory` → `list[agent_framework.ChatMessage]` (direct list usage)
+- `semantic_kernel.utils.logging.setup_logging` → standard Python `logging.basicConfig()`
+
+**Function Call Extraction:**
+- Replaced placeholder implementation with proper Agent Framework content scanning
+- Agent Framework stores function calls as `FunctionCallContent` objects in `ChatMessage.contents`
+- Function calls are extracted by iterating through message contents and checking for `FunctionCallContent` instances
+
+**Message Handling:**
+- Agent Framework uses `ChatMessage` with `contents` list instead of Semantic Kernel's separate content classes
+- Function calls are stored as part of message contents, not separate objects
+- Evaluation target now returns `list[ChatMessage]` instead of `ChatHistory`
+
+### Major features added, updated, removed
+
+#### Enhanced Function Call Processing:
+1. **Native Agent Framework Support**: Function call extraction now uses Agent Framework's native `FunctionCallContent` class
+2. **Improved Content Scanning**: Proper iteration through `ChatMessage.contents` to find function calls
+3. **Maintained Compatibility**: `FunctionCall` evaluation model unchanged, ensuring evaluator compatibility
+4. **Simplified Message Handling**: Removed complex `ChatHistory` abstraction in favor of direct list management
+
+#### Removed Dependencies:
+1. **Semantic Kernel Content Classes**: No longer dependent on SK's content representation
+2. **Semantic Kernel Logging**: Replaced with standard Python logging
+3. **ChatHistory Abstraction**: Simplified to direct list usage for evaluation scenarios
+
+### Patterns, abstractions, data structures, algorithms, etc.
+
+#### Key Migration Patterns:
+
+1. **Function Call Content Access Pattern**
+   ```python
+   # OLD (Semantic Kernel - not directly accessible from messages):
+   # Function calls were separate from message content
+   
+   # NEW (Agent Framework - embedded in message contents):
+   for message in chat_history:
+       if message.contents:
+           for content in message.contents:
+               if isinstance(content, FunctionCallContent):
+                   function_call = FunctionCall.from_FunctionCallContent(content)
+   ```
+
+2. **Message Content Structure**
+   ```python
+   # OLD (Semantic Kernel):
+   ChatMessageContent(role=AuthorRole.ASSISTANT, content="text")
+   
+   # NEW (Agent Framework):
+   ChatMessage(role="assistant", text="text", contents=[...])
+   # Contents can include TextContent, FunctionCallContent, etc.
+   ```
+
+3. **Function Call Property Mapping**
+   ```python
+   # OLD (SK FunctionCallContent):
+   source.name or source.function_name  # Had fallback property
+   
+   # NEW (AF FunctionCallContent):
+   source.name  # Single property name
+   source.call_id  # Call identifier
+   source.arguments  # Already parsed as dict or string
+   ```
+
+4. **Chat History Type**
+   ```python
+   # OLD (Semantic Kernel):
+   from semantic_kernel.contents import ChatHistory
+   history: ChatHistory = ...
+   
+   # NEW (Agent Framework):
+   from agent_framework import ChatMessage
+   history: list[ChatMessage] = ...
+   ```
+
+#### Data Structure Changes:
+
+1. **Function Call Representation**:
+   - Agent Framework `FunctionCallContent` has `call_id`, `name`, and `arguments` properties
+   - Arguments are already parsed (dict or string), no complex JSON handling needed
+   - Single `name` property instead of SK's `name`/`function_name` fallback pattern
+
+2. **Message Content Structure**:
+   - `ChatMessage.contents` is a list that can contain multiple content types
+   - Function calls are embedded alongside text content, not separate objects
+   - Direct iteration over contents to find specific content types
+
+3. **Evaluation Data Flow**:
+   - `SupportTicketChatSimulator.run()` returns `list[ChatMessage]`
+   - `get_function_calls()` accepts `list[ChatMessage]` and returns `list[FunctionCall]`
+   - Evaluation target serializes messages using `ChatMessage.to_dict()`
+
+### Governing design principles
+
+1. **Content Introspection**: Agent Framework embeds different content types (text, function calls, etc.) within message contents, requiring iteration to extract specific types
+
+2. **Simplified Abstractions**: Agent Framework eliminates complex history abstractions in favor of direct list management for evaluation scenarios
+
+3. **Native Type Support**: Function call handling uses Agent Framework's native `FunctionCallContent` without wrapper abstractions
+
+4. **Evaluation Compatibility**: Migration maintains existing `FunctionCall` evaluation model structure to preserve evaluator compatibility
+
+5. **Direct Property Access**: Agent Framework uses consistent single property names (`name` vs SK's `name`/`function_name` fallback)
+
+### Notes and Observations
+
+#### What Went Well:
+- ✅ Agent Framework `FunctionCallContent` structure is well-documented and intuitive
+- ✅ Content iteration pattern is straightforward (`message.contents` list)
+- ✅ Function call extraction implementation is clean and efficient
+- ✅ Evaluation model compatibility maintained without changes
+- ✅ All imports and instantiations work correctly
+- ✅ Round-trip serialization (`to_dict`/`from_dict`) functions properly
+
+#### Challenges:
+- ⚠️ Initial confusion about content access patterns (needed to iterate through `contents`)
+- ⚠️ Property name differences between SK and AF (`function_name` vs `name`)
+- ⚠️ Import path changes required updates across multiple evaluation files
+
+#### Important Discoveries:
+
+1. **Content Storage**: Agent Framework stores function calls as part of `ChatMessage.contents`, not as separate message properties
+2. **Content Types**: Multiple content types can exist in a single message (text + function calls)
+3. **Property Consistency**: Agent Framework uses consistent property naming (`name`, `call_id`, `arguments`)
+4. **Serialization**: `ChatMessage.to_dict()` properly serializes all content types for evaluation
+5. **Type Safety**: Function call extraction maintains proper type annotations throughout
+
+### Testing Status
+
+#### Completed:
+- ✅ Function call extraction from Agent Framework messages
+- ✅ FunctionCall model serialization/deserialization round-trip
+- ✅ Import compatibility across all evaluation modules
+- ✅ Evaluation target instantiation and basic functionality
+- ✅ Chat simulator instantiation with Agent Framework imports
+
+#### Validated Patterns:
+- ✅ `FunctionCallContent` → `FunctionCall` conversion
+- ✅ Multi-content message handling (text + function calls)
+- ✅ Evaluation data structure serialization
+- ✅ Agent Framework content iteration pattern
+
+### Code Quality
+
+- **Type Safety**: Maintained with proper `list[ChatMessage]` and `FunctionCallContent` annotations
+- **Imports**: Clean migration from `semantic_kernel.*` to `agent_framework.*`
+- **Compatibility**: External evaluation interfaces remain unchanged
+- **Documentation**: Updated docstrings to reflect Agent Framework patterns
+- **Error Handling**: Proper isinstance() checks for content type detection
+
+### Migration Metrics
+
+- **Files Modified**: 4 files (models.py, chat_simulator.py, evaluate.py, eval_target.py)
+- **Methods Updated**: 3 main methods (from_FunctionCallContent, get_function_calls, eval_target.__call__)
+- **Pattern Changes**: 4 major pattern updates (imports, content access, type annotations, logging)
+- **Breaking Changes**: 0 (evaluation interfaces remain compatible)
+- **Semantic Kernel Imports Removed**: 4 import statements
+- **Agent Framework Imports Added**: 2 import statements
+- **Lines Changed**: ~40 lines across evaluation system
+- **Function Call Extraction**: Fully implemented with proper content iteration
+
+### Next Steps (Phase 6)
+
+Phase 6 will focus on:
+
+1. Remove `AzureChatPromptExecutionSettings` usage
+2. Update configuration to pass parameters directly to `run()` method
+3. Simplify function choice behavior configuration
+4. Update temperature, max_tokens, and other settings handling
+5. Review and update environment variable handling
