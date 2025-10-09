@@ -120,7 +120,7 @@ def test_case_insensitive_matching():
     """Test that matching is case-insensitive for function names."""
     # Create a version with different case
     case_diff_call = FunctionCall(
-        functionName="ticketMANAGEMENTplugin-create_support_ticket",
+        functionName="CREATE_support_TICKET",
         arguments=FC_TICKET_CREATE.arguments,
     )
 

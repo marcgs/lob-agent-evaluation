@@ -20,9 +20,9 @@ def match_function_calls(
     actual_calls: list[FunctionCall],
     expected_calls: list[FunctionCall],
     ignore_calls: list[str] = [
-        "CommonPlugin-summarize_ticket_details",
-        "CommonPlugin-explain_workflow",
-        "CommonPlugin-start_over",
+        "summarize_ticket_details",
+        "explain_workflow",
+        "start_over",
     ],
 ) -> FunctionCallMatch:
     """

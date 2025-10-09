@@ -4,7 +4,7 @@ from typing import Any
 from evaluation.chatbot.models import FunctionCall
 
 FC_TICKET_CREATE = FunctionCall(
-    functionName="TicketManagementPlugin-create_support_ticket",
+    functionName="create_support_ticket",
     arguments={
         "title": "Email client crashes on startup",
         "description": "When launching the email client, it crashes immediately with an error message",
@@ -15,7 +15,7 @@ FC_TICKET_CREATE = FunctionCall(
 )
 
 FC_TICKET_CREATE_2 = FunctionCall(
-    functionName="TicketManagementPlugin-create_support_ticket-2",
+    functionName="create_support_ticket-2",
     arguments={
         "title": "Network connectivity issues",
         "description": "Unable to connect to the network in meeting room 4",
@@ -26,7 +26,7 @@ FC_TICKET_CREATE_2 = FunctionCall(
 )
 
 FC_TICKET_CREATE_3 = FunctionCall(
-    functionName="TicketManagementPlugin-create_support_ticket-3",
+    functionName="create_support_ticket-3",
     arguments={
         "title": "Printer not working",
         "description": "The printer on 3rd floor is not responding to print jobs",
@@ -37,7 +37,7 @@ FC_TICKET_CREATE_3 = FunctionCall(
 )
 
 FC_TICKET_CREATE_DIFF_ARGS = FunctionCall(
-    functionName="TicketManagementPlugin-create_support_ticket",
+    functionName="create_support_ticket",
     arguments={
         "title": "some-other-title",
         "description": "some-other-description",
@@ -48,12 +48,12 @@ FC_TICKET_CREATE_DIFF_ARGS = FunctionCall(
 )
 
 FC_TICKET_CREATE_NO_ARGS = FunctionCall(
-    functionName="TicketManagementPlugin-create_support_ticket",
+    functionName="create_support_ticket",
     arguments={},
 )
 
 FC_TICKET_CREATE_MISSING_ARG = FunctionCall(
-    functionName="TicketManagementPlugin-create_support_ticket",
+    functionName="create_support_ticket",
     arguments={
         "title": "Email client crashes on startup",
         "description": "When launching the email client, it crashes immediately with an error message",
@@ -74,7 +74,7 @@ FC_TICKET_CREATE_DIFF_NAME = FunctionCall(
 )
 
 FC_TICKET_CREATE_2_DIFF_ARGS = FunctionCall(
-    functionName="TicketManagementPlugin-create_support_ticket-2",
+    functionName="create_support_ticket-2",
     arguments={
         "title": "some-other-title",
         "description": "some-other-description",
@@ -85,12 +85,12 @@ FC_TICKET_CREATE_2_DIFF_ARGS = FunctionCall(
 )
 
 FC_COMMON_START_OVER = FunctionCall(
-    functionName="CommonPlugin-start_over",
+    functionName="start_over",
     arguments={},
 )
 
 FC_REFERENCE_DATA_GET_DEPARTMENTS = FunctionCall(
-    functionName="ReferenceDataPlugin-get_departments",
+    functionName="get_departments",
     arguments={},
 )
 
