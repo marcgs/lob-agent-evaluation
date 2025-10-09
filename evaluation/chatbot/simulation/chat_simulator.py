@@ -1,6 +1,6 @@
 import asyncio
 
-from agent_framework import ChatAgent, ChatMessage, Role
+from agent_framework import ChatAgent, ChatMessage, FunctionCallContent, Role
 
 from app.chatbot.factory import create_support_ticket_agent
 from evaluation.chatbot.models import FunctionCall
@@ -88,7 +88,6 @@ class SupportTicketChatSimulator:
 
             # Check termination condition
             should_agent_terminate = await termination_strategy.should_agent_terminate(
-                agent=support_ticket_agent,
                 history=conversation_history,
             )
 
@@ -106,9 +105,6 @@ class SupportTicketChatSimulator:
         This method retrieves the function calls made by the chatbot.
         It is used for evaluation purposes only.
         """
-        from agent_framework import FunctionCallContent
-        from ..models import FunctionCall
-
         function_calls: list[FunctionCall] = []
         
         # Iterate through all messages in the chat history
@@ -135,7 +131,7 @@ if __name__ == "__main__":
     history = asyncio.run(
         simulator.run(
             instructions=instructions,
-            task_completion_condition="the SupportTicketAgent has confirmed the creation of a Support Ticket",
+            task_completion_condition="the assistant has confirmed the creation of a Support Ticket",
         )
     )
     print(f"Function Calls: {simulator.get_function_calls(history)}")
