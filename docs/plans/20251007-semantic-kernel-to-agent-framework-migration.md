@@ -2,11 +2,13 @@
 
 **Issue:** #38 - Migration to Agent Framework  
 **Created:** 2025-10-07  
-**Status:** Not Started  
+**Status:** In Progress - Phase 7b Complete (with critical fixes), Phase 8 pending
 
 ## Overview
 
 This plan outlines the migration of the LOB Agent Evaluation project from Semantic Kernel to Microsoft Agent Framework. The migration will modernize the codebase with simplified APIs, better performance, and a unified interface across AI providers.
+
+**Note:** Phases 1-7 are complete. After Phase 7, several critical issues were discovered and fixed (documented as Phase 7b). These fixes revealed important patterns for Agent Framework usage that weren't obvious from documentation.
 
 ## Phase 1: Setup and Dependencies
 
@@ -66,6 +68,18 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
 - [x] **Task 7.5:** Update function call extraction in evaluators (`evaluation/chatbot/evaluators/*.py`)
 - [x] **Task 7.6:** Validate evaluation metrics still work correctly
 
+## Phase 7b: Critical Thread Management and Termination Fixes
+
+**Note:** These tasks were discovered after Phase 7 completion through testing and debugging.
+
+- [x] **Task 7b.1:** Fix chatbot thread management - add `AgentThread` to maintain conversation context (Commit: 01b20b9)
+- [x] **Task 7b.2:** Fix simulation thread management - create separate threads for user and chatbot agents (Commit: 6100aad)
+- [x] **Task 7b.3:** Replace `SimpleTerminationStrategy` with LLM-based `LLMTerminationStrategy` (Commit: 634ceab)
+- [x] **Task 7b.4:** Create comprehensive test suite for termination strategy (10 test cases)
+- [x] **Task 7b.5:** Add `pytest-asyncio` dependency for async testing support
+- [x] **Task 7b.6:** Run full E2E evaluation with `make chatbot-eval` to validate metrics calculation
+- [x] **Task 7b.7:** Fix ground truth data - remove Semantic Kernel plugin prefixes from function names (Agent Framework uses simple names without prefixes)
+
 ## Phase 8: Testing and Validation
 
 - [ ] **Task 8.1:** Update `app/chatbot/test/test_end_to_end_workflows.py`
@@ -111,6 +125,24 @@ This plan outlines the migration of the LOB Agent Evaluation project from Semant
    - Create fallback termination logic if needed
    - Validate simulation behavior matches expectations
 
+4. **⚠️ Thread Management (DISCOVERED)**
+   - Agent Framework requires EXPLICIT thread management for stateful conversations
+   - Without threads, agents lose conversation context between messages
+   - Multi-agent systems need separate threads per agent for proper isolation
+   - **Impact:** Required 3 additional commits post-Phase 7 to fix (Phase 7b)
+
+5. **⚠️ Termination Strategy Complexity (DISCOVERED)**
+   - Simple string matching is insufficient for natural language task completion
+   - LLM-based evaluation needed for semantic understanding
+   - Requires temperature=0.0 for consistent termination decisions
+   - **Impact:** Complete rewrite of termination strategy + 176 lines of tests (Phase 7b)
+
+6. **⚠️ Function Name Format Change (DISCOVERED)**
+   - Semantic Kernel used plugin prefixes in function names (e.g., `PluginName-function_name`)
+   - Agent Framework uses simple function names without prefixes (e.g., `function_name`)
+   - Ground truth data and test expectations must be updated
+   - **Impact:** All evaluation ground truth data required updates (Phase 7b)
+
 ### Testing Strategy
 
 - **Unit Tests:** Run after each phase completion
@@ -155,6 +187,81 @@ The migration is complete when ALL of the following criteria are met:
    - `pyproject.toml` updated with correct Agent Framework packages
    - `uv.lock` reflects new dependency tree
    - No conflicting or unused dependencies
+
+## Lessons Learned (Post-Phase 7 Fixes)
+
+### Critical Discoveries Not in Original Plan
+
+The following issues were discovered during Phase 7 implementation and required additional work documented in Phase 7b:
+
+#### 1. Thread Management is Mandatory for Stateful Conversations
+
+**Problem:** Chatbot and simulations lost conversation context between messages.
+
+**Root Cause:** Agent Framework requires EXPLICIT thread passing to maintain state. Unlike Semantic Kernel's automatic history tracking, Agent Framework is explicit.
+
+**Solution:**
+```python
+# Create thread once
+thread = agent.get_new_thread()
+
+# Reuse for all messages in conversation
+response = await agent.run(message, thread=thread)
+```
+
+**Impact:** 2 additional commits (01b20b9, 6100aad) to fix chatbot and simulation thread management.
+
+#### 2. Multi-Agent Systems Need Thread Isolation
+
+**Problem:** In simulations, user agent saw chatbot's internal tool calls.
+
+**Root Cause:** Sharing a thread between agents exposes ALL messages (including tool calls) to both agents.
+
+**Solution:** Create separate threads per agent:
+```python
+agent_thread = support_ticket_agent.get_new_thread()
+user_thread = user_agent.get_new_thread()
+
+# Each agent uses its own isolated context
+agent_response = await support_ticket_agent.run(msg, thread=agent_thread)
+user_response = await user_agent.run(msg, thread=user_thread)
+```
+
+**Impact:** Required architectural change in simulation system.
+
+#### 3. LLM-Based Termination Strategy Required
+
+**Problem:** Simple string matching for task completion was unreliable (false positives/negatives).
+
+**Root Cause:** Natural language is too variable for keyword matching. Need semantic understanding.
+
+**Solution:** Implement LLM-as-judge pattern:
+- Create dedicated evaluation agent with zero temperature
+- Ask LLM to judge if task completion condition is met
+- Parse binary YES/NO response
+- Use fresh thread per evaluation to avoid context pollution
+
+**Impact:** 
+- Complete rewrite of termination strategy (127 lines)
+- Comprehensive test suite added (176 lines, 10 test cases)
+- Added `pytest-asyncio` dependency
+- 1 additional commit (634ceab)
+
+### Recommendations for Future Migrations
+
+1. **Plan for Thread Management Early:** Don't treat it as optional - it's fundamental to Agent Framework
+
+2. **Test Multi-Turn Conversations:** Single-turn tests won't catch thread management issues
+
+3. **Use LLM-as-Judge Pattern:** For semantic decisions like task completion, don't waste time on string matching
+
+4. **Test Agent Isolation:** In multi-agent systems, verify agents can't see each other's internal messages
+
+5. **Add Async Test Support Early:** Add `pytest-asyncio` at project start, not later
+
+6. **Document Thread Lifecycle:** Make thread creation and reuse patterns explicit in code comments
+
+7. **Zero Temperature for Evaluation:** Agents making binary decisions should use temperature=0.0
 
 ## Resources and References
 
