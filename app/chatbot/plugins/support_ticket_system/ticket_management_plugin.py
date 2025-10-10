@@ -44,7 +44,7 @@ class TicketManagementPlugin:
             bool, "Whether this ticket should be visible to the customer."
         ] = False,
     ) -> dict[str, Any]:
-        """Creates a new support ticket in the system."""
+        """Creates a new support ticket in the ticket management system."""
         logging.info("Creating new support ticket")
 
         # Generate a unique ticket ID with "TKT-" prefix
@@ -79,7 +79,7 @@ class TicketManagementPlugin:
         self,
         ticket_id: Annotated[str, "The unique identifier of the ticket to retrieve."],
     ) -> dict[str, Any]:
-        """Retrieves a support ticket by its ID."""
+        """Retrieves a support ticket by its ID from the ticket management system."""
         logging.info(f"Retrieving ticket: {ticket_id}")
 
         if ticket_id in self._tickets:
@@ -107,7 +107,7 @@ class TicketManagementPlugin:
             bool | None, "Whether this ticket should be visible to the customer."
         ] = None,
     ) -> dict[str, Any]:
-        """Updates an existing support ticket in the system."""
+        """Updates an existing support ticket in the ticket management system."""
         logging.info(f"Updating ticket: {ticket_id}")
 
         if ticket_id not in self._tickets:
@@ -154,7 +154,7 @@ class TicketManagementPlugin:
         department_code: Annotated[str | None, "Filter tickets by department code."] = None,
         priority: Annotated[str | None, "Filter tickets by priority level."] = None,
     ) -> dict[str, Any]:
-        """Search for support tickets based on criteria."""
+        """Search for existing support tickets in the ticket management system."""
         logging.info(f"Searching tickets with query: {search_query}")
 
         # Start with all tickets

@@ -8,7 +8,7 @@ class CommonPlugin:
     """Common tasks for support ticket management system"""
 
     def start_over(self) -> str:
-        """Starts a new support ticket management session"""
+        """Starts a new support ticket management session."""
         logger.info("Executing: start_over")
         return "Let's start over with your support ticket request. How can I help you today?"
 
@@ -19,7 +19,7 @@ class CommonPlugin:
         priority: Annotated[str | None, "The priority level of the ticket."] = None,
         description: Annotated[str | None, "The description of the issue."] = None,
     ) -> str:
-        """Provides a summary of the support ticket details the user has provided so far."""
+        """Provides a summary of support ticket details collected from the user."""
         logger.info("Executing: summarize_ticket_details")
 
         summary = "Here's a summary of your support ticket so far:\n\n"
@@ -48,7 +48,7 @@ class CommonPlugin:
             "The type of workflow to explain. Must be one of ['Standard', 'Expedited'].",
         ] = "Standard",
     ) -> str:
-        """Explains the workflow for ticket management to the user."""
+        """Explains support ticket workflow processes to users."""
         logger.info(f"Explaining workflow: {workflow_type}")
 
         if workflow_type == "Standard":

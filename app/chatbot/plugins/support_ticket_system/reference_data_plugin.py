@@ -49,7 +49,7 @@ class ReferenceDataPlugin:
         logging.info("Reference Data Plugin initialized")
 
     def get_departments(self) -> dict[str, Any]:
-        """Get a list of available departments that can handle support tickets"""
+        """Get all available departments from reference data."""
         logging.info("Retrieving department list")
 
         departments: list[dict[str, str | None]] = []
@@ -64,7 +64,7 @@ class ReferenceDataPlugin:
         self,
         department_code: Annotated[str, "Department code to look up"],
     ) -> dict[str, Any]:
-        """Get detailed information about a specific department"""
+        """Get detailed information for a specific department code from reference data."""
         logging.info(f"Looking up department code: {department_code}")
 
         if department_code in self._departments:
@@ -78,7 +78,7 @@ class ReferenceDataPlugin:
             return {"error": f"No department found with code: {department_code}"}
 
     def get_priority_levels(self) -> dict[str, Any]:
-        """Get a list of all available priority levels for tickets"""
+        """Get all available priority levels from the reference data system."""
         logging.info("Retrieving priority levels")
 
         return {
@@ -103,7 +103,7 @@ class ReferenceDataPlugin:
         }
 
     def get_workflow_types(self) -> dict[str, Any]:
-        """Get a list of all available workflow types for tickets"""
+        """Get all available workflow types from the reference data system."""
         logging.info("Retrieving workflow types")
 
         return {
@@ -120,7 +120,7 @@ class ReferenceDataPlugin:
         }
 
     def get_action_item_statuses(self) -> dict[str, Any]:
-        """Get a list of all possible action item statuses"""
+        """Get all available action item statuses from the reference data system."""
         logging.info("Retrieving action item statuses")
 
         return {

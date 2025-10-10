@@ -5,7 +5,7 @@
     "task_completion": "The user has confirmed the end of the session.",
     "expected_function_calls": [
       {
-        "functionName": "TicketManagementPlugin-create_support_ticket",
+        "functionName": "create_support_ticket",
         "arguments": {
           "title": "{ticket.title}",
           "department_code": "{ticket.department_code}",
@@ -17,7 +17,7 @@
         }
       },
       {
-        "functionName": "ActionItemPlugin-create_action_item",
+        "functionName": "create_action_item",
         "arguments": {
           "title": "{action.title}",
           "assignee": "{action.assignee}",
@@ -32,7 +32,7 @@
     "task_completion": "The user has confirmed the end of the session.",
     "expected_function_calls": [
       {
-        "functionName": "TicketManagementPlugin-create_support_ticket",
+        "functionName": "create_support_ticket",
         "arguments": {
           "title": "{ticket.title}",
           "department_code": "{ticket.department_code}",
@@ -44,7 +44,7 @@
         }
       },
       {
-        "functionName": "ActionItemPlugin-create_action_item",
+        "functionName": "create_action_item",
         "arguments": {
           "title": "{action.title}",
           "assignee": "{action.assignee}",
@@ -59,18 +59,18 @@
     "task_completion": "The user has confirmed the end of the session.",
     "expected_function_calls": [
       {
-        "functionName": "TicketManagementPlugin-search_tickets",
+        "functionName": "search_tickets",
         "arguments": {
           "search_query": "printer"
         }
       },
       {
-        "functionName": "TicketManagementPlugin-get_support_ticket",
+        "functionName": "get_support_ticket",
         "arguments": {
         }
       },
       {
-        "functionName": "TicketManagementPlugin-update_support_ticket",
+        "functionName": "update_support_ticket",
         "arguments": {
           "priority": "{ticket.priority}",
           "department_code": "{ticket.department_code}",
@@ -85,11 +85,34 @@
     "task_completion": "The user has confirmed the end of the session.",
     "expected_function_calls": [
       {
-        "functionName": "ActionItemPlugin-update_action_item",
+        "functionName": "update_action_item",
         "arguments": {
           "action_id": "ACT-003",
           "assignee": "{action.assignee}",
           "due_date": "{action.due_date}"
+        }
+      }
+    ]
+  },
+  {
+    "scenario_name": "create_ticket_with_invalid_department",
+    "user_instructions": "Create a new support ticket by manually providing the data. The department code you initially provide is INVALID. If the assistant catches this error and presents you with valid department options, select \"IT\" as the corrected value.",
+    "task_completion": "The user has confirmed the end of the session.",
+    "expected_function_calls": [
+      {
+        "functionName": "get_departments",
+        "arguments": {}
+      },
+      {
+        "functionName": "create_support_ticket",
+        "arguments": {
+          "title": "{ticket.title}",
+          "department_code": "IT",
+          "priority": "{ticket.priority}",
+          "workflow_type": "{ticket.workflow_type}",
+          "description": "{ticket.description}",
+          "expected_outcome": "{ticket.expected_outcome}",
+          "customer_visible": "{ticket.customer_visible}"
         }
       }
     ]

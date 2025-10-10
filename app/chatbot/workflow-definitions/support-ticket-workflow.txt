@@ -24,7 +24,8 @@
 2. Create Support Ticket with manually provided data
    a. Ask the user to provide required values for `create_support_ticket` function.
    b. If some information is missing ask the user for the missing inputs.
-   c. Once all information is collected, proceed to step 4.
+   c. Check that the provided values are valid using reference data.
+   d. Once all information is validated and collected, proceed to step 4.
 
 3. Create Support Ticket based on a previous ticket
    a. Call `search_tickets` to find similar previous tickets.
@@ -49,7 +50,8 @@
 6. Update Support Ticket
    a. Ask the user which fields they would like to update. Derive fields from `update_support_ticket` function.
    b. For each field the user wants to update, ask for the new value.
-   c. Proceed to step 7.
+   c. Check that the provided values are valid using reference data.
+   d. Proceed to step 7.
 
 7. Submit the Support Ticket update
    a. Ask confirmation from the user. Display all fields that will be updated with their new values.
@@ -65,52 +67,54 @@
 9. Collect Action Item details
    a. Ask the user to provide values required for `create_action_item` function.
    b. If some information is missing ask the user for the missing inputs.
-   c. Proceed to step 10.
+   c. Check that the provided values are valid using reference data.
+   d. Proceed to step 10.
 
 10. Create the Action Item
-    a. Ask confirmation from the user. Display all information for creating an action item.
-    b. Call `create_action_item` with the provided information.
-    c. Output the Action Item details including the newly assigned action item ID.
-    d. Go to step 0.
+   a. Ask confirmation from the user. Display all information for creating an action item.
+   b. Call `create_action_item` with the provided information.
+   c. Output the Action Item details including the newly assigned action item ID.
+   d. Go to step 0.
 
 11. Gather information to call `update_action_item`.
-    a. Ask the user for the action item ID they want to update.
-    b. If the user does not know the action item ID, ask for other identifying information (e.g., ticket title, assignee, due date).
-    c. If action item ID is not provided, attempt to search for action items using the provided details:
-       1. If one match is found, proceed with that action item.
-       2. If multiple matches are found, present the list to the user for selection.
-       3. If no matches are found, offer to broaden the search (e.g., partial matches, remove filters) or ask for more details.
-       4. If still not found, suggest the user check their records or provide alternative identifiers (e.g., related ticket details, keywords, or approximate dates).
-    d. Once the action item is identified, call `get_action_item_details` to retrieve the current action item information.
-    e. Display the current action item information to the user.
-    f. Proceed to step 12.
+   a. Ask the user for the action item ID they want to update.
+   b. If the user does not know the action item ID, ask for other identifying information (e.g., ticket title, assignee, due date).
+   c. If action item ID is not provided, attempt to search for action items using the provided details:
+      1. If one match is found, proceed with that action item.
+      2. If multiple matches are found, present the list to the user for selection.
+      3. If no matches are found, offer to broaden the search (e.g., partial matches, remove filters) or ask for more details.
+      4. If still not found, suggest the user check their records or provide alternative identifiers (e.g., related ticket details, keywords, or approximate dates).
+   d. Once the action item is identified, call `get_action_item_details` to retrieve the current action item information.
+   e. Display the current action item information to the user.
+   f. Proceed to step 12.
 
 12. Update Action Item
-    a. Ask the user which fields they would like to update. Derive fields from `update_action_item` function.
-    b. For each field the user wants to update, ask for the new value.
-    c. Proceed to step 13.
+   a. Ask the user which fields they would like to update. Derive fields from `update_action_item` function.
+   b. For each field the user wants to update, ask for the new value.
+   c. Check that the provided values are valid using reference data.
+   c. Proceed to step 13.
 
 13. Submit the Action Item update
-    a. Ask confirmation from the user. Display all fields that will be updated with their new values.
-    b. Call `update_action_item` with the provided information.
-    c. Output the updated Action Item details.
-    d. Go to step 0.
+   a. Ask confirmation from the user. Display all fields that will be updated with their new values.
+   b. Call `update_action_item` with the provided information.
+   c. Output the updated Action Item details.
+   d. Go to step 0.
 
 14. Search Historical Tickets
-    a. Ask the user for search criteria. Derive available fields to search by from `search_tickets` function.
-    b. Call `search_tickets` with the provided search criteria.
-    c. If no results are found, offer to broaden the search (e.g., remove filters, use partial matches) or ask the user to refine their criteria.
-    d. Display the search results to the user.
-    e. Ask if the user wants to:
-       1. View details of a specific ticket (go to step 15)
-       2. Modify their search (repeat step 14)
-       3. Return to the main menu (go to step 0)
+   a. Ask the user for search criteria. Derive available fields to search by from `search_tickets` function.
+   b. Call `search_tickets` with the provided search criteria.
+   c. If no results are found, offer to broaden the search (e.g., remove filters, use partial matches) or ask the user to refine their criteria.
+   d. Display the search results to the user.
+   e. Ask if the user wants to:
+      1. View details of a specific ticket (go to step 15)
+      2. Modify their search (repeat step 14)
+      3. Return to the main menu (go to step 0)
 
 15. Display Ticket Details
-    a. Call `get_ticket_details` for the selected ticket ID.
-    b. Display comprehensive ticket details, including any action items.
-    c. Ask if the user wants to:
-       1. Update this ticket (go to step 5)
-       2. Create an action item for this ticket (go to step 8)
-       3. Return to the search results (go to step 14)
-       4. Return to the main menu (go to step 0)
+   a. Call `get_ticket_details` for the selected ticket ID.
+   b. Display comprehensive ticket details, including any action items.
+   c. Ask if the user wants to:
+      1. Update this ticket (go to step 5)
+      2. Create an action item for this ticket (go to step 8)
+      3. Return to the search results (go to step 14)
+      4. Return to the main menu (go to step 0)

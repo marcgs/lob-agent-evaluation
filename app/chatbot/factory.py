@@ -31,6 +31,7 @@ def create_support_ticket_agent(
         instructions=_load_support_ticket_instructions(),
         chat_client=client,
         tools=tools,
+        tool_choice="auto",  # Enable automatic tool calling (equivalent to Semantic Kernel's FunctionChoiceBehavior.Auto())
         temperature=0.3,
         top_p=0.9,
     )
