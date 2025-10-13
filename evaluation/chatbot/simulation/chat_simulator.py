@@ -4,7 +4,10 @@ from agent_framework import ChatAgent, ChatMessage, FunctionCallContent, Role
 
 from app.chatbot.factory import create_support_ticket_agent
 from evaluation.chatbot.models import FunctionCall
-from evaluation.chatbot.simulation.factory import create_termination_strategy, create_user_agent
+from evaluation.chatbot.simulation.factory import (
+    create_termination_strategy,
+    create_user_agent,
+)
 
 
 class SupportTicketChatSimulator:
@@ -26,7 +29,7 @@ class SupportTicketChatSimulator:
             instructions (str): Instructions for the user agent to follow.
             task_completion_condition (str): Condition to determine if the task is complete.
         """
-        
+
         support_ticket_agent: ChatAgent = create_support_ticket_agent(
             name="SupportTicketAgent"
         )
@@ -53,10 +56,12 @@ class SupportTicketChatSimulator:
 
         while True:
             # Get response from support ticket agent using Agent Framework
-            agent_response = await support_ticket_agent.run(user_message_text, thread=agent_thread)
-            
+            agent_response = await support_ticket_agent.run(
+                user_message_text, thread=agent_thread
+            )
+
             # Use the messages from the agent response to preserve function call content
-            print("-"*100)
+            print("-" * 100)
             if agent_response.messages:
                 # Add all messages from the response to preserve function calls
                 for message in agent_response.messages:
@@ -66,8 +71,7 @@ class SupportTicketChatSimulator:
             else:
                 # Fallback: create a simple message if no messages in response
                 agent_message = ChatMessage(
-                    role=Role.ASSISTANT, 
-                    text=agent_response.text
+                    role=Role.ASSISTANT, text=agent_response.text
                 )
                 conversation_history.append(agent_message)
                 print(f"Support Ticket Agent: {agent_message.text}")
@@ -77,13 +81,10 @@ class SupportTicketChatSimulator:
 
             # Get response from user agent
             user_response = await user_agent.run(assistant_text, thread=user_thread)
-            user_message = ChatMessage(
-                role=Role.USER, 
-                text=user_response.text
-            )
+            user_message = ChatMessage(role=Role.USER, text=user_response.text)
             conversation_history.append(user_message)
-            
-            print("-"*100)
+
+            print("-" * 100)
             print(f"User: {user_message.text}")
 
             # Check termination condition
@@ -106,7 +107,7 @@ class SupportTicketChatSimulator:
         It is used for evaluation purposes only.
         """
         function_calls: list[FunctionCall] = []
-        
+
         # Iterate through all messages in the chat history
         for message in chat_history:
             # Check if the message has contents and is from the assistant
@@ -117,7 +118,7 @@ class SupportTicketChatSimulator:
                         # Convert Agent Framework FunctionCallContent to our FunctionCall model
                         function_call = FunctionCall.from_FunctionCallContent(content)
                         function_calls.append(function_call)
-        
+
         return function_calls
 
 

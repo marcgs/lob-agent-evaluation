@@ -8,6 +8,7 @@ class EvaluatorResult:
     """
     Class to represent the evaluator result model
     """
+
     score: float
 
 

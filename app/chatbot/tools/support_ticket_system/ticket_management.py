@@ -69,7 +69,9 @@ class TicketManagement:
             return {
                 "ticket_id": ticket_id,
                 "status": "created",
-                "created_at": ticket.created_at.isoformat() if ticket.created_at else None,
+                "created_at": ticket.created_at.isoformat()
+                if ticket.created_at
+                else None,
             }
         except ValueError as e:
             logging.error(f"Failed to create ticket: {str(e)}")
@@ -102,7 +104,9 @@ class TicketManagement:
         expected_outcome: Annotated[
             str | None, "Updated expected outcome for this ticket."
         ] = None,
-        resolution: Annotated[str | None, "Solution or resolution for the ticket."] = None,
+        resolution: Annotated[
+            str | None, "Solution or resolution for the ticket."
+        ] = None,
         customer_visible: Annotated[
             bool | None, "Whether this ticket should be visible to the customer."
         ] = None,
@@ -151,7 +155,9 @@ class TicketManagement:
         search_query: Annotated[
             str | None, "Natural language search query to find relevant tickets."
         ] = None,
-        department_code: Annotated[str | None, "Filter tickets by department code."] = None,
+        department_code: Annotated[
+            str | None, "Filter tickets by department code."
+        ] = None,
         priority: Annotated[str | None, "Filter tickets by priority level."] = None,
     ) -> dict[str, Any]:
         """Search for existing support tickets in the ticket management system."""

@@ -6,7 +6,9 @@ from evaluation.chatbot.simulation.termination_strategy import LLMTerminationStr
 
 
 def create_user_agent(
-    name: str, instructions: str, client: Any = None  # Keeping compatible interface for now
+    name: str,
+    instructions: str,
+    client: Any = None,  # Keeping compatible interface for now
 ) -> ChatAgent:
     """
     Create a user agent with the given name and instructions.

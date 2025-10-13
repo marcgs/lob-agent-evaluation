@@ -24,12 +24,9 @@ def test_exact_match_single_call():
 
     function_name = FC_TICKET_CREATE.functionName.lower()
     assert function_name in result.matched_calls
+    assert result.matched_calls[function_name].actual_args == FC_TICKET_CREATE.arguments
     assert (
-        result.matched_calls[function_name].actual_args == FC_TICKET_CREATE.arguments
-    )
-    assert (
-        result.matched_calls[function_name].expected_args
-        == FC_TICKET_CREATE.arguments
+        result.matched_calls[function_name].expected_args == FC_TICKET_CREATE.arguments
     )
 
 
@@ -99,8 +96,7 @@ def test_different_arguments():
         == FC_TICKET_CREATE_DIFF_ARGS.arguments
     )
     assert (
-        result.matched_calls[function_name].expected_args
-        == FC_TICKET_CREATE.arguments
+        result.matched_calls[function_name].expected_args == FC_TICKET_CREATE.arguments
     )
 
 
@@ -172,6 +168,5 @@ def test_different_function_name_similar_args():
 
     assert FC_TICKET_CREATE.functionName.lower() in result.unmatched_expected_calls
     assert (
-        FC_TICKET_CREATE_DIFF_NAME.functionName.lower()
-        in result.unmatched_actual_calls
+        FC_TICKET_CREATE_DIFF_NAME.functionName.lower() in result.unmatched_actual_calls
     )

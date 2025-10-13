@@ -69,7 +69,9 @@ class ActionItemTools:
             return {
                 "action_id": action_id,
                 "status": "created",
-                "created_at": action_item.created_at.isoformat() if action_item.created_at else None,
+                "created_at": action_item.created_at.isoformat()
+                if action_item.created_at
+                else None,
             }
         except ValueError as e:
             logging.error(f"Failed to create action item: {str(e)}")
@@ -132,7 +134,8 @@ class ActionItemTools:
         title: Annotated[str | None, "Updated title for the action item."] = None,
         assignee: Annotated[str | None, "Updated assignee for the action item."] = None,
         due_date: Annotated[
-            str | None, "Updated due date for the action item in ISO format (YYYY-MM-DD)."
+            str | None,
+            "Updated due date for the action item in ISO format (YYYY-MM-DD).",
         ] = None,
         status: Annotated[
             str | None,
@@ -200,8 +203,12 @@ class ActionItemTools:
             "title": action_item.title,
             "assignee": action_item.assignee,
             "status": action_item.status.value,
-            "created_at": action_item.created_at.isoformat() if action_item.created_at else None,
-            "updated_at": action_item.updated_at.isoformat() if action_item.updated_at else None,
+            "created_at": action_item.created_at.isoformat()
+            if action_item.created_at
+            else None,
+            "updated_at": action_item.updated_at.isoformat()
+            if action_item.updated_at
+            else None,
         }
 
         if action_item.due_date:

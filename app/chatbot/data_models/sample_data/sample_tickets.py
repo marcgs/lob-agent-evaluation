@@ -19,37 +19,37 @@ DEPARTMENTS = [
     Department(
         code="IT",
         name="Information Technology",
-        description="Handles all IT-related issues and infrastructure."
+        description="Handles all IT-related issues and infrastructure.",
     ),
     Department(
         code="HR",
         name="Human Resources",
-        description="Manages employee relations, benefits, and recruitment."
+        description="Manages employee relations, benefits, and recruitment.",
     ),
     Department(
         code="FIN",
         name="Finance",
-        description="Responsible for financial planning, management, and reporting."
+        description="Responsible for financial planning, management, and reporting.",
     ),
     Department(
         code="MKTG",
         name="Marketing",
-        description="Oversees marketing campaigns and brand management."
+        description="Oversees marketing campaigns and brand management.",
     ),
     Department(
         code="OPS",
         name="Operations",
-        description="Ensures smooth day-to-day business operations."
+        description="Ensures smooth day-to-day business operations.",
     ),
     Department(
         code="CUST",
         name="Customer Support",
-        description="Provides assistance and support to customers."
+        description="Provides assistance and support to customers.",
     ),
     Department(
         code="PROD",
         name="Product Development",
-        description="Leads product design, development, and improvement."
+        description="Leads product design, development, and improvement.",
     ),
 ]
 

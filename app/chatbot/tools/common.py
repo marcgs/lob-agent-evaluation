@@ -15,7 +15,9 @@ class Common:
     def summarize_ticket_details(
         self,
         title: Annotated[str | None, "The title of the support ticket."] = None,
-        department: Annotated[str | None, "The department the ticket is assigned to."] = None,
+        department: Annotated[
+            str | None, "The department the ticket is assigned to."
+        ] = None,
         priority: Annotated[str | None, "The priority level of the ticket."] = None,
         description: Annotated[str | None, "The description of the issue."] = None,
     ) -> str:

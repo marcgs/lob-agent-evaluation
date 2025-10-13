@@ -10,6 +10,7 @@ from app.chatbot.tools.support_ticket_system.action_item import (
     ActionItemTools,
 )
 
+
 # Disabling the pyright error for private usage in this test file
 # pyright: reportPrivateUsage=false
 class TestEndToEndWorkflows(unittest.TestCase):

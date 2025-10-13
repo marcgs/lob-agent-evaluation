@@ -6,6 +6,7 @@ from app.chatbot.tools.support_ticket_system.action_item import (
 )
 from app.chatbot.data_models.ticket_models import ActionItem, ActionItemStatus
 
+
 # Disabling the pyright error for private usage in this test file
 # pyright: reportPrivateUsage=false
 class TestActionItemTools(unittest.TestCase):
@@ -59,7 +60,9 @@ class TestActionItemTools(unittest.TestCase):
         # Add a null check before accessing isoformat
         self.assertIsNotNone(action_item.due_date)
         if action_item.due_date:
-            self.assertEqual(action_item.due_date.isoformat().split("T")[0], "2025-06-01")
+            self.assertEqual(
+                action_item.due_date.isoformat().split("T")[0], "2025-06-01"
+            )
 
         # Verify the ticket-to-actions mapping was updated
         self.assertIn("TKT-TEST456", self.tool._ticket_to_actions)

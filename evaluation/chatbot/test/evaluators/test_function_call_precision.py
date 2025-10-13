@@ -92,7 +92,10 @@ def test_function_call_precision_evaluator(
     actual: list[FunctionCall], expected: list[FunctionCall], expected_score: float
 ):
     evaluator = FunctionCallPrecisionEvaluator()
-    result = evaluator(actual_function_calls=convert_to_dict(actual), expected_function_calls=convert_to_dict(expected))
+    result = evaluator(
+        actual_function_calls=convert_to_dict(actual),
+        expected_function_calls=convert_to_dict(expected),
+    )
     assert result.score == expected_score
 
 

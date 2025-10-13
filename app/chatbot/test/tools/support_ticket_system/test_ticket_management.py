@@ -9,6 +9,7 @@ from app.chatbot.data_models.ticket_models import (
     TicketWorkflowType,
 )
 
+
 # Disabling the pyright error for private usage in this test file
 # pyright: reportPrivateUsage=false
 class TestTicketManagement(unittest.TestCase):

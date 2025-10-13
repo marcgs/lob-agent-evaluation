@@ -41,7 +41,7 @@ class EvaluationService:
 
         try:
             # call evaluate from evaluation SDK
-            eval_result: EvaluationResult = eval_sdk.evaluate( # pyright: ignore[reportUnknownMemberType] As required by the Azure AI Evaluation SDK
+            eval_result: EvaluationResult = eval_sdk.evaluate(  # pyright: ignore[reportUnknownMemberType] As required by the Azure AI Evaluation SDK
                 evaluation_name=experiment_name,
                 data=ground_truth_data_path,
                 target=eval_target,
@@ -53,7 +53,6 @@ class EvaluationService:
         except Exception as e:
             logging.error(f"Found an error during evaluation: {e}")
             raise
-
 
         # Extract the metrics and rows from the evaluation result
         metrics: list[dict[str, Any]] = [{**eval_result["metrics"]}]

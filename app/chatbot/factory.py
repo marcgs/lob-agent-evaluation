@@ -53,6 +53,7 @@ def create_azure_openai_chat_client() -> AzureOpenAIChatClient:
     )
     return client
 
+
 def _load_support_ticket_instructions() -> str:
     """
     Load the support ticket management instructions from a file.
@@ -78,10 +79,10 @@ def _load_support_ticket_instructions() -> str:
 def _load_support_ticket_tools() -> list[Callable[..., Any]]:
     """
     Load the support ticket management tools.
-    
+
     Automatically discovers all public methods from tool instances.
     Methods starting with '_' are considered private and excluded.
-    
+
     Returns:
         list[Callable[..., Any]]: A list of tool methods from tool instances.
     """
@@ -108,7 +109,9 @@ def _load_support_ticket_tools() -> list[Callable[..., Any]]:
     # This automatically discovers tool functions without manual listing
     tools: list[Callable[..., Any]] = []
     for tool_instance in tool_instances:
-        for name, method in inspect.getmembers(tool_instance, predicate=inspect.ismethod):
+        for name, method in inspect.getmembers(
+            tool_instance, predicate=inspect.ismethod
+        ):
             # Skip private methods (starting with _) and special methods (starting with __)
             if not name.startswith("_"):
                 tools.append(method)

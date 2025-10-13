@@ -23,13 +23,13 @@ class FunctionCallEvaluator(Evaluator):
         **kwargs: Any,
     ) -> EvaluatorResult:
         # Convert the function calls to FunctionCall objects
-        actual = [FunctionCall.from_dict(f) for f in actual_function_calls] # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
-        expected = [FunctionCall.from_dict(f) for f in expected_function_calls] # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
-        return EvaluatorResult(
-            score=self.evaluate(actual, expected)
-        )
-    
+        actual = [FunctionCall.from_dict(f) for f in actual_function_calls]  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
+        expected = [FunctionCall.from_dict(f) for f in expected_function_calls]  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
+        return EvaluatorResult(score=self.evaluate(actual, expected))
+
     def evaluate(
-        self, actual_function_calls: list[FunctionCall], expected_function_calls: list[FunctionCall]
+        self,
+        actual_function_calls: list[FunctionCall],
+        expected_function_calls: list[FunctionCall],
     ) -> float:
         raise NotImplementedError("Subclasses should implement this method.")

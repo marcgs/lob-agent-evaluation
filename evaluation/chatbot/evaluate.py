@@ -97,11 +97,11 @@ def run_support_ticket_evaluation(
     copy_and_execute_notebook(
         notebook_name="error_analysis_chatbot.ipynb",
         root_path=chatbot_eval_root_path(),
-        output_path=Path(output_path)
+        output_path=Path(output_path),
     )
 
     # convert results to dataframe
-    df: pd.DataFrame = pd.DataFrame(results).round(2) # pyright: ignore[reportUnknownMemberType] As required by pandas
+    df: pd.DataFrame = pd.DataFrame(results).round(2)  # pyright: ignore[reportUnknownMemberType] As required by pandas
     print(df.transpose())
     print(output_path)
 
