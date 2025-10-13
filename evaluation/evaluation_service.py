@@ -61,8 +61,8 @@ class EvaluationService:
                 **eval_result["metrics"],
                 "rows": eval_result["rows"],
                 **(
-                    {"studio_url": eval_result.get("studio_url")}  # pyright: ignore[reportUnknownMemberType]
-                    if eval_result.get("studio_url")  # pyright: ignore[reportUnknownMemberType]
+                    {"studio_url": eval_result.get("studio_url")}  # pyright: ignore[reportUnknownMemberType] As required by the Azure AI Evaluation SDK
+                    if eval_result.get("studio_url")  # pyright: ignore[reportUnknownMemberType] As required by the Azure AI Evaluation SDK
                     else {}
                 ),
             }

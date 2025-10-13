@@ -18,8 +18,8 @@ class FunctionCallEvaluator(Evaluator):
     def __call__(
         self,
         *,
-        actual_function_calls: list[dict[str, object]],
-        expected_function_calls: list[dict[str, object]],
+        actual_function_calls: dict, # pyright: ignore[reportUnknownParameterType, reportMissingTypeArgument] As required by the Azure AI Evaluation SDK
+        expected_function_calls: dict, # pyright: ignore[reportUnknownParameterType, reportMissingTypeArgument] As required by the Azure AI Evaluation SDK
         **kwargs: Any,
     ) -> EvaluatorResult:
         # Convert the function calls to FunctionCall objects
