@@ -4,7 +4,7 @@ from typing import Annotated, Any
 from app.chatbot.data_models.ticket_models import Department
 
 
-class ReferenceDataPlugin:
+class ReferenceData:
     """Reference data provider for support ticket management system"""
 
     def __init__(self):

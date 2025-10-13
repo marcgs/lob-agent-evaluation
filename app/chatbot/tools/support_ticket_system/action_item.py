@@ -10,7 +10,7 @@ from app.chatbot.data_models.sample_data.sample_tickets import (
 )
 
 
-class ActionItemPlugin:
+class ActionItemTools:
     """Action item management functions for the support ticket system"""
 
     def __init__(self):

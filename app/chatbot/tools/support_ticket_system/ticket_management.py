@@ -11,7 +11,7 @@ from app.chatbot.data_models.ticket_models import (
 from app.chatbot.data_models.sample_data.sample_tickets import TICKETS_BY_ID
 
 
-class TicketManagementPlugin:
+class TicketManagement:
     """Support ticket management functions"""
 
     def __init__(self):

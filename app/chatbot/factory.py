@@ -31,7 +31,7 @@ def create_support_ticket_agent(
         instructions=_load_support_ticket_instructions(),
         chat_client=client,
         tools=tools,
-        tool_choice="auto",  # Enable automatic tool calling (equivalent to Semantic Kernel's FunctionChoiceBehavior.Auto())
+        tool_choice="auto",  # Enable automatic tool calling
         temperature=0.3,
         top_p=0.9,
     )
@@ -77,38 +77,38 @@ def _load_support_ticket_instructions() -> str:
 
 def _load_support_ticket_tools() -> list[Callable[..., Any]]:
     """
-    Load the support ticket management tools (plugins converted to tools).
+    Load the support ticket management tools.
     
-    Automatically discovers all public methods from plugin instances.
+    Automatically discovers all public methods from tool instances.
     Methods starting with '_' are considered private and excluded.
     
     Returns:
-        list[Callable[..., Any]]: A list of tool methods from plugin instances.
+        list[Callable[..., Any]]: A list of tool methods from tool instances.
     """
-    from app.chatbot.plugins.common_plugin import CommonPlugin
-    from app.chatbot.plugins.support_ticket_system.ticket_management_plugin import (
-        TicketManagementPlugin,
+    from app.chatbot.tools.common import Common
+    from app.chatbot.tools.support_ticket_system.ticket_management import (
+        TicketManagement,
     )
-    from app.chatbot.plugins.support_ticket_system.action_item_plugin import (
-        ActionItemPlugin,
+    from app.chatbot.tools.support_ticket_system.action_item import (
+        ActionItemTools,
     )
-    from app.chatbot.plugins.support_ticket_system.reference_data_plugin import (
-        ReferenceDataPlugin,
+    from app.chatbot.tools.support_ticket_system.reference_data import (
+        ReferenceData,
     )
 
-    # Instantiate plugins
-    plugins = [
-        CommonPlugin(),
-        TicketManagementPlugin(),
-        ActionItemPlugin(),
-        ReferenceDataPlugin(),
+    # Instantiate tools
+    tool_instances = [
+        Common(),
+        TicketManagement(),
+        ActionItemTools(),
+        ReferenceData(),
     ]
 
-    # Extract all public methods from each plugin instance
+    # Extract all public methods from each tool instance
     # This automatically discovers tool functions without manual listing
     tools: list[Callable[..., Any]] = []
-    for plugin in plugins:
-        for name, method in inspect.getmembers(plugin, predicate=inspect.ismethod):
+    for tool_instance in tool_instances:
+        for name, method in inspect.getmembers(tool_instance, predicate=inspect.ismethod):
             # Skip private methods (starting with _) and special methods (starting with __)
             if not name.startswith("_"):
                 tools.append(method)

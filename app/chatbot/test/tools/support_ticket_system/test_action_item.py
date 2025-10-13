@@ -1,22 +1,22 @@
 import unittest
 from datetime import datetime
 
-from app.chatbot.plugins.support_ticket_system.action_item_plugin import (
-    ActionItemPlugin,
+from app.chatbot.tools.support_ticket_system.action_item import (
+    ActionItemTools,
 )
 from app.chatbot.data_models.ticket_models import ActionItem, ActionItemStatus
 
 # Disabling the pyright error for private usage in this test file
 # pyright: reportPrivateUsage=false
-class TestActionItemPlugin(unittest.TestCase):
+class TestActionItemTools(unittest.TestCase):
     """Test cases for the Action Item Plugin"""
 
     def setUp(self):
         """Set up the test environment before each test method"""
-        self.plugin = ActionItemPlugin()
+        self.tool = ActionItemTools()
         # For testing, ensure we have clean storage
-        self.plugin._action_items = {}
-        self.plugin._ticket_to_actions = {}
+        self.tool._action_items = {}
+        self.tool._ticket_to_actions = {}
 
         # Create a sample action item for testing
         self.sample_action_item = ActionItem(
@@ -27,14 +27,14 @@ class TestActionItemPlugin(unittest.TestCase):
             status=ActionItemStatus.OPEN,
             due_date=datetime.fromisoformat("2025-05-15"),
         )
-        self.plugin._action_items[self.sample_action_item.action_id] = (
+        self.tool._action_items[self.sample_action_item.action_id] = (
             self.sample_action_item
         )
-        self.plugin._ticket_to_actions["TKT-TEST123"] = ["ACT-TEST123"]
+        self.tool._ticket_to_actions["TKT-TEST123"] = ["ACT-TEST123"]
 
     def test_create_action_item(self):
         """Test creating a new action item"""
-        result = self.plugin.create_action_item(
+        result = self.tool.create_action_item(
             parent_ticket_id="TKT-TEST456",
             title="New Test Action Item",
             assignee="John Doe",
@@ -48,10 +48,10 @@ class TestActionItemPlugin(unittest.TestCase):
 
         # Check that the action item was actually stored
         action_id = result["action_id"]
-        self.assertIn(action_id, self.plugin._action_items)
+        self.assertIn(action_id, self.tool._action_items)
 
         # Verify the action item properties
-        action_item = self.plugin._action_items[action_id]
+        action_item = self.tool._action_items[action_id]
         self.assertEqual(action_item.parent_ticket_id, "TKT-TEST456")
         self.assertEqual(action_item.title, "New Test Action Item")
         self.assertEqual(action_item.assignee, "John Doe")
@@ -62,12 +62,12 @@ class TestActionItemPlugin(unittest.TestCase):
             self.assertEqual(action_item.due_date.isoformat().split("T")[0], "2025-06-01")
 
         # Verify the ticket-to-actions mapping was updated
-        self.assertIn("TKT-TEST456", self.plugin._ticket_to_actions)
-        self.assertIn(action_id, self.plugin._ticket_to_actions["TKT-TEST456"])
+        self.assertIn("TKT-TEST456", self.tool._ticket_to_actions)
+        self.assertIn(action_id, self.tool._ticket_to_actions["TKT-TEST456"])
 
     def test_get_action_item(self):
         """Test retrieving an action item by ID"""
-        result = self.plugin.get_action_item(action_id="ACT-TEST123")
+        result = self.tool.get_action_item(action_id="ACT-TEST123")
 
         # Check that the action item is returned correctly
         self.assertEqual(result["action_id"], "ACT-TEST123")
@@ -79,14 +79,14 @@ class TestActionItemPlugin(unittest.TestCase):
 
     def test_get_nonexistent_action_item(self):
         """Test retrieving an action item that doesn't exist"""
-        result = self.plugin.get_action_item(action_id="ACT-NONEXISTENT")
+        result = self.tool.get_action_item(action_id="ACT-NONEXISTENT")
 
         # Check that an error is returned
         self.assertIn("error", result)
 
     def test_update_action_item_status(self):
         """Test updating the status of an action item"""
-        result = self.plugin.update_action_item_status(
+        result = self.tool.update_action_item_status(
             action_id="ACT-TEST123", status="In Progress"
         )
 
@@ -96,12 +96,12 @@ class TestActionItemPlugin(unittest.TestCase):
         self.assertEqual(result["current_action_status"], "In Progress")
 
         # Verify the action item was actually updated
-        updated_action = self.plugin._action_items["ACT-TEST123"]
+        updated_action = self.tool._action_items["ACT-TEST123"]
         self.assertEqual(updated_action.status, ActionItemStatus.IN_PROGRESS)
 
     def test_update_action_item_with_invalid_status(self):
         """Test updating an action item with invalid status"""
-        result = self.plugin.update_action_item_status(
+        result = self.tool.update_action_item_status(
             action_id="ACT-TEST123",
             status="InvalidStatus",  # This is invalid
         )
@@ -111,7 +111,7 @@ class TestActionItemPlugin(unittest.TestCase):
 
     def test_update_action_item(self):
         """Test updating multiple fields of an action item"""
-        result = self.plugin.update_action_item(
+        result = self.tool.update_action_item(
             action_id="ACT-TEST123",
             title="Updated Action Item Title",
             assignee="Jane Smith",
@@ -124,7 +124,7 @@ class TestActionItemPlugin(unittest.TestCase):
         self.assertEqual(result["status"], "updated")
 
         # Verify the action item was actually updated
-        updated_action = self.plugin._action_items["ACT-TEST123"]
+        updated_action = self.tool._action_items["ACT-TEST123"]
         self.assertEqual(updated_action.title, "Updated Action Item Title")
         self.assertEqual(updated_action.assignee, "Jane Smith")
         self.assertEqual(updated_action.status, ActionItemStatus.COMPLETED)
@@ -145,11 +145,11 @@ class TestActionItemPlugin(unittest.TestCase):
             assignee="Another User",
             status=ActionItemStatus.IN_PROGRESS,
         )
-        self.plugin._action_items[second_action.action_id] = second_action
-        self.plugin._ticket_to_actions["TKT-TEST123"].append("ACT-TEST456")
+        self.tool._action_items[second_action.action_id] = second_action
+        self.tool._ticket_to_actions["TKT-TEST123"].append("ACT-TEST456")
 
         # Test retrieving action items for the ticket
-        result = self.plugin.get_ticket_action_items(ticket_id="TKT-TEST123")
+        result = self.tool.get_ticket_action_items(ticket_id="TKT-TEST123")
 
         # Check that both action items are returned
         self.assertEqual(result["count"], 2)
@@ -159,7 +159,7 @@ class TestActionItemPlugin(unittest.TestCase):
 
     def test_get_action_items_for_nonexistent_ticket(self):
         """Test retrieving action items for a ticket that has none"""
-        result = self.plugin.get_ticket_action_items(ticket_id="TKT-NONEXISTENT")
+        result = self.tool.get_ticket_action_items(ticket_id="TKT-NONEXISTENT")
 
         # Check that an empty list is returned
         self.assertEqual(result["count"], 0)

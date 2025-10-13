@@ -4,7 +4,7 @@ from typing import Annotated
 logger = logging.getLogger("agent")
 
 
-class CommonPlugin:
+class Common:
     """Common tasks for support ticket management system"""
 
     def start_over(self) -> str:
