@@ -5,9 +5,17 @@ Tests the termination strategy's ability to correctly identify when conversation
 have reached completion based on specified task completion conditions.
 """
 
+import os
+
 import pytest
 from agent_framework import ChatMessage, Role
 from evaluation.chatbot.simulation.termination_strategy import LLMTerminationStrategy
+
+# Skip all tests in this module when running in CI
+pytestmark = pytest.mark.skipif(
+    os.getenv("CI") == "true" or os.getenv("GITHUB_ACTIONS") == "true",
+    reason="Requires Azure OpenAI configuration not available in CI",
+)
 
 
 class TestLLMTerminationStrategy:
