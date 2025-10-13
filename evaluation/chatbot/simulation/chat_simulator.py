@@ -1,6 +1,6 @@
 import asyncio
 
-from agent_framework import ChatAgent, ChatMessage, FunctionCallContent, Role
+from agent_framework import ChatAgent, ChatMessage, FunctionCallContent
 
 from app.chatbot.factory import create_support_ticket_agent
 from evaluation.chatbot.models import FunctionCall
@@ -40,66 +40,34 @@ class SupportTicketChatSimulator:
             task_completion_condition=task_completion_condition
         )
 
-        # Store conversation history manually since Agent Framework handles threads differently
-        conversation_history: list[ChatMessage] = []
-
         # The agent thread is used to make sure the support ticket agent retains the full context of the conversation
         # it also contains the function calls made by the chatbot and is then returned for evaluation purposes
-        agent_thread = support_ticket_agent.get_new_thread()
-
-        # The user thread is used to make sure user agent retains the full context of the conversation
-        # it's separated from the agent thread to avoid exposing tool calls and other messages to the user agent
-        user_thread = user_agent.get_new_thread()
-
-        # Initial system message to start the conversation
-        user_message_text = "Starting the simulation"
+        thread = support_ticket_agent.get_new_thread()
 
         while True:
             # Get response from support ticket agent using Agent Framework
-            agent_response = await support_ticket_agent.run(
-                user_message_text, thread=agent_thread
-            )
+            agent_response = await support_ticket_agent.run(thread=thread)
 
             # Use the messages from the agent response to preserve function call content
-            print("-" * 100)
-            if agent_response.messages:
-                # Add all messages from the response to preserve function calls
-                for message in agent_response.messages:
-                    if message.role == Role.ASSISTANT:  # Only add assistant messages
-                        conversation_history.append(message)
-                        print(f"Support Ticket Agent: {message.text}")
-            else:
-                # Fallback: create a simple message if no messages in response
-                agent_message = ChatMessage(
-                    role=Role.ASSISTANT, text=agent_response.text
-                )
-                conversation_history.append(agent_message)
-                print(f"Support Ticket Agent: {agent_message.text}")
-
-            # Get the assistant's text for the user response
-            assistant_text = agent_response.text
+            print("---")
+            print(f"AGENT:\n {agent_response.text}")            
 
             # Get response from user agent
-            user_response = await user_agent.run(assistant_text, thread=user_thread)
-            user_message = ChatMessage(role=Role.USER, text=user_response.text)
-            conversation_history.append(user_message)
+            user_response = await user_agent.run(thread=thread)
 
-            print("-" * 100)
-            print(f"User: {user_message.text}")
+            print("---")
+            print(f"USER:\n {user_response.text}")
+
+            assert thread.message_store is not None, "Thread message store should not be None"
+            history = await thread.message_store.list_messages()
 
             # Check termination condition
-            should_agent_terminate = await termination_strategy.should_agent_terminate(
-                history=conversation_history,
-            )
-
-            if should_agent_terminate:
+            if await termination_strategy.should_agent_terminate(history=history):
+                print("---")
                 print("Task completed")
                 break
 
-            # Set up next iteration
-            user_message_text = user_message.text
-
-        return conversation_history
+        return history
 
     def get_function_calls(self, chat_history: list[ChatMessage]) -> list[FunctionCall]:
         """
@@ -129,10 +97,10 @@ if __name__ == "__main__":
     # Start the simulation for ticket creation
     instructions = "You are a user who wants to create a new support ticket for a software issue. You need a ticket with title 'Email client crashes on startup', assigned to the IT department, with High priority and Expedited workflow. Provide a detailed description of the issue when asked."
 
-    history = asyncio.run(
+    messages = asyncio.run(
         simulator.run(
             instructions=instructions,
             task_completion_condition="the assistant has confirmed the creation of a Support Ticket",
         )
     )
-    print(f"Function Calls: {simulator.get_function_calls(history)}")
+    print(f"Function Calls: {simulator.get_function_calls(messages)}")
