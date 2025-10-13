@@ -43,7 +43,7 @@ make chatbot-eval  # Runs evaluation against ground truth datasets
 ## Project Structure
 
 - `app/chatbot/` - Support Ticket Management implementation
-  - `plugins/support_ticket_system/` - [Agent Framework tools](https://learn.microsoft.com/en-us/agent-framework/concepts/agents-and-tools) for function calling
+  - `tools/support_ticket_system/` - [Agent Framework tools](https://learn.microsoft.com/en-us/agent-framework/concepts/agents-and-tools) for function calling
   - `data_models/` - Data structures for tickets and action items
   - `workflow-definitions/` - Workflow definitions that guide conversations
 - `evaluation/` - Evaluation framework components
