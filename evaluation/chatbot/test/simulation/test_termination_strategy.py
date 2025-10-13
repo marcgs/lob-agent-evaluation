@@ -108,7 +108,7 @@ class TestLLMTerminationStrategy:
     @pytest.mark.asyncio
     async def test_empty_conversation_history(self, support_ticket_strategy: LLMTerminationStrategy):
         """Test behavior with empty conversation history."""
-        messages = []
+        messages: list[ChatMessage] = []
         
         result = await support_ticket_strategy.should_agent_terminate(history=messages)
         

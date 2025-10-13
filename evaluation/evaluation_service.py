@@ -57,11 +57,17 @@ class EvaluationService:
 
         # Extract the metrics and rows from the evaluation result
         metrics: list[dict[str, Any]] = [{**eval_result["metrics"]}]
-        detailed_results: list[dict[str, Any]] = [{
-            **eval_result["metrics"],
-            "rows": eval_result["rows"],
-            **({"studio_url": eval_result.get("studio_url")} if eval_result.get("studio_url") else {}) # pyright: ignore[reportUnknownMemberType] As required by the Azure AI Evaluation SDK
-        }]
+        detailed_results: list[dict[str, Any]] = [
+            {
+                **eval_result["metrics"],
+                "rows": eval_result["rows"],
+                **(
+                    {"studio_url": eval_result.get("studio_url")}  # pyright: ignore[reportUnknownMemberType]
+                    if eval_result.get("studio_url")  # pyright: ignore[reportUnknownMemberType]
+                    else {}
+                ),
+            }
+        ]
 
         # Save the results to a file
         utils.save_to_file(metrics, detailed_results, output_path)
