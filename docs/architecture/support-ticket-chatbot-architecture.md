@@ -20,7 +20,7 @@ The `SupportTicketAgent` class serves as the main orchestrator for the chatbot s
 The `agent_factory.py` module is responsible for creating and configuring the agent:
 
 - Creates an Agent Framework ChatAgent with Azure OpenAI integration
-- Loads and registers all necessary tools using `@ai_function` decorators
+- Loads and registers all necessary tools by importing python functions and methods
 - Configures the agent with appropriate settings:
   - Temperature for controlled response generation
   - Top-p sampling for diverse responses
@@ -56,7 +56,7 @@ The chatbot uses a modular tools architecture for business logic:
 
 - Core functions: `create_support_ticket`, `get_support_ticket`, `update_support_ticket`, `search_tickets`
 - Manages the lifecycle of support tickets with validation and storage
-- Each function is annotated with `@ai_function` and detailed parameter descriptions for the LLM
+- Each function is annotated with detailed parameter descriptions for the LLM
 
 #### Action Item Tools
 
@@ -114,7 +114,7 @@ The system integrates with Azure OpenAI through Agent Framework's `AzureOpenAICh
 
 The system is designed for extensibility:
 
-1. **Add New Tools**: Create new Python functions with `@ai_function` decorators
+1. **Add New Tools**: Create new Python functions or class methods and register them with LLM Agent
 2. **Extend Data Models**: Add fields or create new model classes
 3. **Modify Workflow**: Update the text-based workflow definition
 4. **Add New Agent Types**: Use the agent factory pattern to create specialized agents

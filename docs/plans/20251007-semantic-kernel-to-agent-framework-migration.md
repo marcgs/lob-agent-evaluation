@@ -162,7 +162,7 @@ The migration is complete when ALL of the following criteria are met:
    - All `semantic_kernel` imports replaced with `agent_framework` imports
    - All agents migrated from `ChatCompletionAgent` to `ChatAgent`
    - Kernel dependency completely removed
-   - All plugins converted to Agent Framework tools using `@ai_function` or plain functions
+   - All plugins converted to Agent Framework tools using class methods or plain functions
 
 2. **✅ Functionality Preserved**
    - All existing unit tests passing
