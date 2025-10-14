@@ -1,12 +1,10 @@
 import logging
 from typing import Annotated, Any
 
-from semantic_kernel.functions import kernel_function
-
 from app.chatbot.data_models.ticket_models import Department
 
 
-class ReferenceDataPlugin:
+class ReferenceData:
     """Reference data provider for support ticket management system"""
 
     def __init__(self):
@@ -50,12 +48,8 @@ class ReferenceDataPlugin:
         }
         logging.info("Reference Data Plugin initialized")
 
-    @kernel_function(
-        name="get_departments",
-        description="Get a list of available departments that can handle support tickets",
-    )
     def get_departments(self) -> dict[str, Any]:
-        """Returns all available departments in the system"""
+        """Get all available departments from reference data."""
         logging.info("Retrieving department list")
 
         departments: list[dict[str, str | None]] = []
@@ -66,15 +60,11 @@ class ReferenceDataPlugin:
 
         return {"departments": departments}
 
-    @kernel_function(
-        name="get_department_by_code",
-        description="Get detailed information about a specific department",
-    )
     def get_department_by_code(
         self,
         department_code: Annotated[str, "Department code to look up"],
     ) -> dict[str, Any]:
-        """Returns details for a specific department by its code"""
+        """Get detailed information for a specific department code from reference data."""
         logging.info(f"Looking up department code: {department_code}")
 
         if department_code in self._departments:
@@ -87,12 +77,8 @@ class ReferenceDataPlugin:
         else:
             return {"error": f"No department found with code: {department_code}"}
 
-    @kernel_function(
-        name="get_priority_levels",
-        description="Get a list of all available priority levels for tickets",
-    )
     def get_priority_levels(self) -> dict[str, Any]:
-        """Returns all available priority levels for tickets"""
+        """Get all available priority levels from the reference data system."""
         logging.info("Retrieving priority levels")
 
         return {
@@ -116,12 +102,8 @@ class ReferenceDataPlugin:
             ]
         }
 
-    @kernel_function(
-        name="get_workflow_types",
-        description="Get a list of all available workflow types for tickets",
-    )
     def get_workflow_types(self) -> dict[str, Any]:
-        """Returns all available workflow types for tickets"""
+        """Get all available workflow types from the reference data system."""
         logging.info("Retrieving workflow types")
 
         return {
@@ -137,12 +119,8 @@ class ReferenceDataPlugin:
             ]
         }
 
-    @kernel_function(
-        name="get_action_item_statuses",
-        description="Get a list of all possible action item statuses",
-    )
     def get_action_item_statuses(self) -> dict[str, Any]:
-        """Returns all possible statuses for action items"""
+        """Get all available action item statuses from the reference data system."""
         logging.info("Retrieving action item statuses")
 
         return {

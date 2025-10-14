@@ -16,7 +16,9 @@ class FunctionCallRecallEvaluator(FunctionCallEvaluator):
     """
 
     def evaluate(
-        self, actual_function_calls: list[FunctionCall], expected_function_calls: list[FunctionCall]
+        self,
+        actual_function_calls: list[FunctionCall],
+        expected_function_calls: list[FunctionCall],
     ) -> float:
         match_result: FunctionCallMatch = match_function_calls(
             actual_function_calls, expected_function_calls
@@ -44,7 +46,9 @@ class FunctionCallArgsRecallEvaluator(FunctionCallEvaluator):
     """
 
     def evaluate(
-        self, actual_function_calls: list[FunctionCall], expected_function_calls: list[FunctionCall]
+        self,
+        actual_function_calls: list[FunctionCall],
+        expected_function_calls: list[FunctionCall],
     ) -> float:
         match_result: FunctionCallMatch = match_function_calls(
             actual_function_calls, expected_function_calls

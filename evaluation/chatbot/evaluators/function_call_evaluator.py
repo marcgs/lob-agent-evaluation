@@ -15,15 +15,21 @@ class FunctionCallEvaluator(Evaluator):
         super().__init__()
 
     # Ignore certain type checks as the Azure AI Evaluation SDK does not support Python complex types
-    def __call__(self, *, actual_function_calls: dict, expected_function_calls: dict, **kwargs: Any) -> EvaluatorResult: # pyright: ignore[reportUnknownParameterType, reportMissingTypeArgument] As required by the Azure AI Evaluation SDK
+    def __call__(
+        self,
+        *,
+        actual_function_calls: dict, # pyright: ignore[reportUnknownParameterType, reportMissingTypeArgument] As required by the Azure AI Evaluation SDK
+        expected_function_calls: dict, # pyright: ignore[reportUnknownParameterType, reportMissingTypeArgument] As required by the Azure AI Evaluation SDK
+        **kwargs: Any,
+    ) -> EvaluatorResult:
         # Convert the function calls to FunctionCall objects
-        actual = [FunctionCall.from_dict(f) for f in actual_function_calls] # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
-        expected = [FunctionCall.from_dict(f) for f in expected_function_calls] # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
-        return EvaluatorResult(
-            score=self.evaluate(actual, expected)
-        )
-    
+        actual = [FunctionCall.from_dict(f) for f in actual_function_calls]  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
+        expected = [FunctionCall.from_dict(f) for f in expected_function_calls]  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType, reportUnknownVariableType]
+        return EvaluatorResult(score=self.evaluate(actual, expected))
+
     def evaluate(
-        self, actual_function_calls: list[FunctionCall], expected_function_calls: list[FunctionCall]
+        self,
+        actual_function_calls: list[FunctionCall],
+        expected_function_calls: list[FunctionCall],
     ) -> float:
         raise NotImplementedError("Subclasses should implement this method.")

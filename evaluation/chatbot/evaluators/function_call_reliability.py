@@ -1,7 +1,8 @@
 from evaluation.chatbot.evaluators.function_call_evaluator import FunctionCallEvaluator
 from evaluation.chatbot.models import FunctionCall
 from evaluation.chatbot.evaluators.function_call_recall import (
-    FunctionCallRecallEvaluator, FunctionCallArgsRecallEvaluator
+    FunctionCallRecallEvaluator,
+    FunctionCallArgsRecallEvaluator,
 )
 
 
@@ -14,7 +15,9 @@ class FunctionCallReliabilityEvaluator(FunctionCallEvaluator):
     """
 
     def evaluate(
-        self, actual_function_calls: list[FunctionCall], expected_function_calls: list[FunctionCall]
+        self,
+        actual_function_calls: list[FunctionCall],
+        expected_function_calls: list[FunctionCall],
     ) -> float:
         """
         Calculate the reliability of function calls.
@@ -26,6 +29,8 @@ class FunctionCallReliabilityEvaluator(FunctionCallEvaluator):
             FunctionCallArgsRecallEvaluator(),
         ]
         for evaluator in evaluators:
-            scores.append(evaluator.evaluate(actual_function_calls, expected_function_calls))
-        
+            scores.append(
+                evaluator.evaluate(actual_function_calls, expected_function_calls)
+            )
+
         return sum(scores) / len(scores)

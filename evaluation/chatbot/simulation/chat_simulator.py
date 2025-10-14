@@ -1,18 +1,13 @@
 import asyncio
 
-from semantic_kernel.contents import ChatHistory, ChatMessageContent
-from semantic_kernel.agents import (
-    ChatCompletionAgent,
-    ChatHistoryAgentThread,
-    AgentResponseItem,
-)
-from semantic_kernel.agents.strategies import KernelFunctionTerminationStrategy
-from semantic_kernel.contents.function_call_content import FunctionCallContent
-from semantic_kernel.contents.utils.author_role import AuthorRole
+from agent_framework import ChatAgent, ChatMessage, FunctionCallContent
 
 from app.chatbot.factory import create_support_ticket_agent
 from evaluation.chatbot.models import FunctionCall
-from evaluation.chatbot.simulation.factory import create_termination_strategy, create_user_agent
+from evaluation.chatbot.simulation.factory import (
+    create_termination_strategy,
+    create_user_agent,
+)
 
 
 class SupportTicketChatSimulator:
@@ -26,7 +21,7 @@ class SupportTicketChatSimulator:
         self,
         instructions: str,
         task_completion_condition: str,
-    ) -> ChatHistory:
+    ) -> list[ChatMessage]:
         """
         This method simulates a conversation between a user and a support ticket agent.
 
@@ -34,84 +29,63 @@ class SupportTicketChatSimulator:
             instructions (str): Instructions for the user agent to follow.
             task_completion_condition (str): Condition to determine if the task is complete.
         """
-        
-        support_ticket_agent: ChatCompletionAgent = create_support_ticket_agent(
+
+        support_ticket_agent: ChatAgent = create_support_ticket_agent(
             name="SupportTicketAgent"
         )
-        user_agent: ChatCompletionAgent = create_user_agent(
+        user_agent: ChatAgent = create_user_agent(
             name="UserAgent", instructions=instructions
         )
-        termination_strategy: KernelFunctionTerminationStrategy = (
-            create_termination_strategy(
-                task_completion_condition=task_completion_condition
-            )
+        termination_strategy = create_termination_strategy(
+            task_completion_condition=task_completion_condition
         )
 
         # The agent thread is used to make sure the support ticket agent retains the full context of the conversation
         # it also contains the function calls made by the chatbot and is then returned for evaluation purposes
-        agent_thread: ChatHistoryAgentThread = ChatHistoryAgentThread(
-            thread_id="ChatSimulatorAgentThread"
-        )
-        # The user thread is used to make sure user agent retains the full context of the conversation
-        # it's separated from the agent thread to avoid exposing tool calls and other messages to the user agent
-        user_thread: ChatHistoryAgentThread = ChatHistoryAgentThread(
-            thread_id="ChatSimulatorUserThread"
-        )
-
-        # Initial system message coming to have the Support Ticket Agent start the conversation
-        user_message: ChatMessageContent = ChatMessageContent(
-            content="Starting the simulation", role=AuthorRole.SYSTEM, name="system"
-        )
+        thread = support_ticket_agent.get_new_thread()
 
         while True:
-            agent_message: AgentResponseItem[ChatMessageContent] = await support_ticket_agent.get_response(
-                messages=user_message, thread=agent_thread
-            )
+            # Get response from support ticket agent using Agent Framework
+            agent_response = await support_ticket_agent.run(thread=thread)
 
-            print(f"Support Ticket Agent: {agent_message.to_dict()}")
+            # Use the messages from the agent response to preserve function call content
+            print("---")
+            print(f"AGENT:\n {agent_response.text}")            
 
-            user_response = await user_agent.get_response(
-                messages=agent_message.content, thread=user_thread
-            )
+            # Get response from user agent
+            user_response = await user_agent.run(thread=thread)
 
-            # Set the role to user for the support ticket agent to think it is a user message
-            user_message = user_response.content
-            user_message = ChatMessageContent(
-                content=user_message.content,
-                role=AuthorRole.USER,
-                name=user_message.name
-            )
-            
-            print(f"User: {user_message.to_dict()}")
+            print("---")
+            print(f"USER:\n {user_response.text}")
 
-            # Convert to list of messages to satisfy the type checker
-            messages_list = await agent_thread.get_messages()
-            # # Convert ChatHistory to list[ChatMessageContent] to solve type compatibility issue
-            should_agent_terminate = await termination_strategy.should_agent_terminate(
-                agent=support_ticket_agent,
-                history=[msg for msg in messages_list], # list comprehension required for resolving type compatibility
-            )
+            assert thread.message_store is not None, "Thread message store should not be None"
+            history = await thread.message_store.list_messages()
 
-            if should_agent_terminate:
+            # Check termination condition
+            if await termination_strategy.should_agent_terminate(history=history):
+                print("---")
                 print("Task completed")
                 break
 
-        history = await agent_thread.get_messages()
-
         return history
 
-    def get_function_calls(self, chatHistory: ChatHistory) -> list[FunctionCall]:
+    def get_function_calls(self, chat_history: list[ChatMessage]) -> list[FunctionCall]:
         """
         This method retrieves the function calls made by the chatbot.
         It is used for evaluation purposes only.
         """
+        function_calls: list[FunctionCall] = []
 
-        function_calls: list[FunctionCall] = [
-            FunctionCall.from_FunctionCallContent(item)
-                for chatMessageContent in chatHistory 
-                for item in chatMessageContent.items 
-                if isinstance(item, FunctionCallContent)
-        ]
+        # Iterate through all messages in the chat history
+        for message in chat_history:
+            # Check if the message has contents and is from the assistant
+            if message.contents and str(message.role) == "assistant":
+                # Look for FunctionCallContent in the message contents
+                for content in message.contents:
+                    if isinstance(content, FunctionCallContent):
+                        # Convert Agent Framework FunctionCallContent to our FunctionCall model
+                        function_call = FunctionCall.from_FunctionCallContent(content)
+                        function_calls.append(function_call)
 
         return function_calls
 
@@ -123,10 +97,10 @@ if __name__ == "__main__":
     # Start the simulation for ticket creation
     instructions = "You are a user who wants to create a new support ticket for a software issue. You need a ticket with title 'Email client crashes on startup', assigned to the IT department, with High priority and Expedited workflow. Provide a detailed description of the issue when asked."
 
-    history = asyncio.run(
+    messages = asyncio.run(
         simulator.run(
             instructions=instructions,
-            task_completion_condition="the SupportTicketAgent has confirmed the creation of a Support Ticket",
+            task_completion_condition="the assistant has confirmed the creation of a Support Ticket",
         )
     )
-    print(f"Function Calls: {simulator.get_function_calls(history)}")
+    print(f"Function Calls: {simulator.get_function_calls(messages)}")

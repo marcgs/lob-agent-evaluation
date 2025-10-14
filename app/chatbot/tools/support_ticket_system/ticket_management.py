@@ -3,8 +3,6 @@ import logging
 from datetime import datetime
 from typing import Annotated, Any
 
-from semantic_kernel.functions import kernel_function
-
 from app.chatbot.data_models.ticket_models import (
     SupportTicket,
     TicketPriority,
@@ -13,7 +11,7 @@ from app.chatbot.data_models.ticket_models import (
 from app.chatbot.data_models.sample_data.sample_tickets import TICKETS_BY_ID
 
 
-class TicketManagementPlugin:
+class TicketManagement:
     """Support ticket management functions"""
 
     def __init__(self):
@@ -21,10 +19,6 @@ class TicketManagementPlugin:
         self._tickets: dict[str, SupportTicket] = TICKETS_BY_ID
         logging.info("Ticket Management Plugin initialized")
 
-    @kernel_function(
-        name="create_support_ticket",
-        description="Creates a new support ticket in the system.",
-    )
     def create_support_ticket(
         self,
         title: Annotated[
@@ -50,6 +44,7 @@ class TicketManagementPlugin:
             bool, "Whether this ticket should be visible to the customer."
         ] = False,
     ) -> dict[str, Any]:
+        """Creates a new support ticket in the ticket management system."""
         logging.info("Creating new support ticket")
 
         # Generate a unique ticket ID with "TKT-" prefix
@@ -74,20 +69,19 @@ class TicketManagementPlugin:
             return {
                 "ticket_id": ticket_id,
                 "status": "created",
-                "created_at": ticket.created_at.isoformat() if ticket.created_at else None,
+                "created_at": ticket.created_at.isoformat()
+                if ticket.created_at
+                else None,
             }
         except ValueError as e:
             logging.error(f"Failed to create ticket: {str(e)}")
             return {"error": f"Failed to create ticket: {str(e)}"}
 
-    @kernel_function(
-        name="get_support_ticket",
-        description="Retrieves a support ticket by its ID.",
-    )
     def get_support_ticket(
         self,
         ticket_id: Annotated[str, "The unique identifier of the ticket to retrieve."],
     ) -> dict[str, Any]:
+        """Retrieves a support ticket by its ID from the ticket management system."""
         logging.info(f"Retrieving ticket: {ticket_id}")
 
         if ticket_id in self._tickets:
@@ -96,10 +90,6 @@ class TicketManagementPlugin:
         else:
             return {"error": f"No ticket found with ID: {ticket_id}"}
 
-    @kernel_function(
-        name="update_support_ticket",
-        description="Updates an existing support ticket in the system.",
-    )
     def update_support_ticket(
         self,
         ticket_id: Annotated[str, "The unique identifier of the ticket to update."],
@@ -114,11 +104,14 @@ class TicketManagementPlugin:
         expected_outcome: Annotated[
             str | None, "Updated expected outcome for this ticket."
         ] = None,
-        resolution: Annotated[str | None, "Solution or resolution for the ticket."] = None,
+        resolution: Annotated[
+            str | None, "Solution or resolution for the ticket."
+        ] = None,
         customer_visible: Annotated[
             bool | None, "Whether this ticket should be visible to the customer."
         ] = None,
     ) -> dict[str, Any]:
+        """Updates an existing support ticket in the ticket management system."""
         logging.info(f"Updating ticket: {ticket_id}")
 
         if ticket_id not in self._tickets:
@@ -157,18 +150,17 @@ class TicketManagementPlugin:
             "updated_at": ticket.updated_at.isoformat(),
         }
 
-    @kernel_function(
-        name="search_tickets",
-        description="Search for support tickets based on criteria.",
-    )
     def search_tickets(
         self,
         search_query: Annotated[
             str | None, "Natural language search query to find relevant tickets."
         ] = None,
-        department_code: Annotated[str | None, "Filter tickets by department code."] = None,
+        department_code: Annotated[
+            str | None, "Filter tickets by department code."
+        ] = None,
         priority: Annotated[str | None, "Filter tickets by priority level."] = None,
     ) -> dict[str, Any]:
+        """Search for existing support tickets in the ticket management system."""
         logging.info(f"Searching tickets with query: {search_query}")
 
         # Start with all tickets

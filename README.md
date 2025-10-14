@@ -6,7 +6,7 @@ This project demonstrates a line-of-business (LOB) chatbot implementation using 
 
 ### Support Ticket Management Chatbot
 
-The Support Ticket Management chatbot is built with [Semantic Kernel](https://github.com/microsoft/semantic-kernel), where users can:
+The Support Ticket Management chatbot is built with [Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/), where users can:
 
 - Create and update support tickets
 - Manage action items within tickets
@@ -43,7 +43,7 @@ make chatbot-eval  # Runs evaluation against ground truth datasets
 ## Project Structure
 
 - `app/chatbot/` - Support Ticket Management implementation
-  - `plugins/support_ticket_system/` - [Semantic Kernel plugins](https://learn.microsoft.com/semantic-kernel/agents/plugins/) for function calling
+  - `tools/support_ticket_system/` - [Agent Framework tools](https://learn.microsoft.com/en-us/agent-framework/concepts/agents-and-tools) for function calling
   - `data_models/` - Data structures for tickets and action items
   - `workflow-definitions/` - Workflow definitions that guide conversations
 - `evaluation/` - Evaluation framework components

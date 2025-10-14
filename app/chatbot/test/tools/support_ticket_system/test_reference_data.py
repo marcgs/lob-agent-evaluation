@@ -1,20 +1,20 @@
 import unittest
 
-from app.chatbot.plugins.support_ticket_system.reference_data_plugin import (
-    ReferenceDataPlugin,
+from app.chatbot.tools.support_ticket_system.reference_data import (
+    ReferenceData,
 )
 
 
-class TestReferenceDataPlugin(unittest.TestCase):
+class TestReferenceData(unittest.TestCase):
     """Test cases for the Reference Data Plugin"""
 
     def setUp(self):
         """Set up the test environment before each test method"""
-        self.plugin = ReferenceDataPlugin()
+        self.tool = ReferenceData()
 
     def test_get_departments(self):
         """Test retrieving all departments"""
-        result = self.plugin.get_departments()
+        result = self.tool.get_departments()
 
         # Check the structure of the response
         self.assertIn("departments", result)
@@ -32,7 +32,7 @@ class TestReferenceDataPlugin(unittest.TestCase):
     def test_get_department_by_code(self):
         """Test retrieving a specific department by its code"""
         # Test with a valid department code
-        result = self.plugin.get_department_by_code(department_code="IT")
+        result = self.tool.get_department_by_code(department_code="IT")
 
         # Check that the department info is returned correctly
         self.assertEqual(result["code"], "IT")
@@ -41,14 +41,14 @@ class TestReferenceDataPlugin(unittest.TestCase):
 
     def test_get_nonexistent_department(self):
         """Test retrieving a department that doesn't exist"""
-        result = self.plugin.get_department_by_code(department_code="NONEXISTENT")
+        result = self.tool.get_department_by_code(department_code="NONEXISTENT")
 
         # Check that an error is returned
         self.assertIn("error", result)
 
     def test_get_priority_levels(self):
         """Test retrieving all priority levels"""
-        result = self.plugin.get_priority_levels()
+        result = self.tool.get_priority_levels()
 
         # Check the structure of the response
         self.assertIn("priority_levels", result)
@@ -71,7 +71,7 @@ class TestReferenceDataPlugin(unittest.TestCase):
 
     def test_get_workflow_types(self):
         """Test retrieving all workflow types"""
-        result = self.plugin.get_workflow_types()
+        result = self.tool.get_workflow_types()
 
         # Check the structure of the response
         self.assertIn("workflow_types", result)
@@ -92,7 +92,7 @@ class TestReferenceDataPlugin(unittest.TestCase):
 
     def test_get_action_item_statuses(self):
         """Test retrieving all action item statuses"""
-        result = self.plugin.get_action_item_statuses()
+        result = self.tool.get_action_item_statuses()
 
         # Check the structure of the response
         self.assertIn("action_item_statuses", result)

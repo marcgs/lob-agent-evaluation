@@ -6,7 +6,6 @@ import logging
 import os
 
 from azure.ai.evaluation import AzureAIProject, EvaluatorConfig
-from semantic_kernel.utils.logging import setup_logging
 
 from evaluation.chatbot.evaluators.evaluator import Evaluator
 from evaluation.chatbot.root_path import chatbot_eval_root_path
@@ -25,8 +24,7 @@ from evaluation.chatbot.eval_target import SupportTicketEvaluationTarget
 from evaluation.evaluation_service import EvaluationService
 from evaluation.common import copy_and_execute_notebook, generate_experiment_name
 
-# Set the logging level for semantic_kernel.kernel to DEBUG.
-setup_logging()
+# Setup logging configuration
 logging.basicConfig(level=logging.INFO)
 
 
@@ -99,11 +97,11 @@ def run_support_ticket_evaluation(
     copy_and_execute_notebook(
         notebook_name="error_analysis_chatbot.ipynb",
         root_path=chatbot_eval_root_path(),
-        output_path=Path(output_path)
+        output_path=Path(output_path),
     )
 
     # convert results to dataframe
-    df: pd.DataFrame = pd.DataFrame(results).round(2) # pyright: ignore[reportUnknownMemberType] As required by pandas
+    df: pd.DataFrame = pd.DataFrame(results).round(2)  # pyright: ignore[reportUnknownMemberType] As required by pandas
     print(df.transpose())
     print(output_path)
 

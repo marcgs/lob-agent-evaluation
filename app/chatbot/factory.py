@@ -1,72 +1,59 @@
+import inspect
 import os
-from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-from semantic_kernel.connectors.ai.function_choice_behavior import (
-    FunctionChoiceBehavior,
-)
-from semantic_kernel.agents import ChatCompletionAgent
-from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
-    AzureChatPromptExecutionSettings,
-)
-from semantic_kernel.functions.kernel_arguments import KernelArguments
+from collections.abc import Callable
+from typing import Any
+from agent_framework import ChatAgent
+from agent_framework.azure import AzureOpenAIChatClient
 from app.chatbot.root_path import chatbot_root_path
 
 
 def create_support_ticket_agent(
-    name: str, kernel: Kernel | None = None
-) -> ChatCompletionAgent:
+    name: str, client: AzureOpenAIChatClient | None = None
+) -> ChatAgent:
     """
     Create a support ticket management agent with the specified name and instructions.
     Args:
         name (str): The name of the agent.
-        kernel (Kernel|None): The kernel instance to use. If None, a new kernel will be created.
+        client (AzureOpenAIChatClient|None): The Azure OpenAI chat client to use. If None, a new client will be created.
     Returns:
-        ChatCompletionAgent: The created support ticket management agent.
+        ChatAgent: The created support ticket management agent.
     """
 
-    if kernel is None:
-        kernel = create_kernel_with_chat_completion(service_id=name)
+    if client is None:
+        client = create_azure_openai_chat_client()
 
-    _load_support_ticket_plugins(kernel)
+    tools = _load_support_ticket_tools()
 
-    # Enable planning
-    execution_settings = AzureChatPromptExecutionSettings()
-    execution_settings.function_choice_behavior = FunctionChoiceBehavior.Auto() # pyright: ignore[reportUnknownMemberType] As required by the Semantic Kernel SDK
-    execution_settings.temperature = 0.3
-    execution_settings.top_p = 0.9
-
-    # Create the agent
-    agent = ChatCompletionAgent(
-        kernel=kernel,
+    # Create the agent with Agent Framework
+    agent = ChatAgent(
         id=name,
         name=name,
         instructions=_load_support_ticket_instructions(),
-        arguments=KernelArguments(settings=execution_settings),
+        chat_client=client,
+        tools=tools,
+        tool_choice="auto",  # Enable automatic tool calling
+        temperature=0.3,
+        top_p=0.9,
+        max_completion_tokens=4000,  # Limit output tokens to prevent exceeding context window
     )
 
     return agent
 
 
-def create_kernel_with_chat_completion(service_id: str | None = None) -> Kernel:
+def create_azure_openai_chat_client() -> AzureOpenAIChatClient:
     """
-    Create a kernel with Azure OpenAI chat completion service.
-    Args:
-        service_id (str|None): The service ID for the Azure OpenAI service. If None, a default ID will be used.
+    Create an Azure OpenAI chat client.
     Returns:
-        Kernel: The created kernel instance.
+        AzureOpenAIChatClient: The created Azure OpenAI chat client.
     """
-    kernel = Kernel()
-
-    # Add Azure OpenAI chat completion
-    kernel.add_service(
-        AzureChatCompletion(
-            service_id=service_id,
-            deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
-            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-            endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        )
+    client = AzureOpenAIChatClient(
+        deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
     )
-    return kernel
+    return client
+
 
 def _load_support_ticket_instructions() -> str:
     """
@@ -90,24 +77,44 @@ def _load_support_ticket_instructions() -> str:
         return instructions
 
 
-def _load_support_ticket_plugins(kernel: Kernel):
+def _load_support_ticket_tools() -> list[Callable[..., Any]]:
     """
-    Load the support ticket management plugins based on the specified plugin type.
-    Args:
-        kernel (Kernel): The kernel instance to load the plugins into.
+    Load the support ticket management tools.
+
+    Automatically discovers all public methods from tool instances.
+    Methods starting with '_' are considered private and excluded.
+
+    Returns:
+        list[Callable[..., Any]]: A list of tool methods from tool instances.
     """
-    from app.chatbot.plugins.common_plugin import CommonPlugin
-    from app.chatbot.plugins.support_ticket_system.ticket_management_plugin import (
-        TicketManagementPlugin,
+    from app.chatbot.tools.common import Common
+    from app.chatbot.tools.support_ticket_system.ticket_management import (
+        TicketManagement,
     )
-    from app.chatbot.plugins.support_ticket_system.action_item_plugin import (
-        ActionItemPlugin,
+    from app.chatbot.tools.support_ticket_system.action_item import (
+        ActionItemTools,
     )
-    from app.chatbot.plugins.support_ticket_system.reference_data_plugin import (
-        ReferenceDataPlugin,
+    from app.chatbot.tools.support_ticket_system.reference_data import (
+        ReferenceData,
     )
 
-    kernel.add_plugin(CommonPlugin(), plugin_name="CommonPlugin")
-    kernel.add_plugin(TicketManagementPlugin(), plugin_name="TicketManagementPlugin")
-    kernel.add_plugin(ActionItemPlugin(), plugin_name="ActionItemPlugin")
-    kernel.add_plugin(ReferenceDataPlugin(), plugin_name="ReferenceDataPlugin")
+    # Instantiate tools
+    tool_instances = [
+        Common(),
+        TicketManagement(),
+        ActionItemTools(),
+        ReferenceData(),
+    ]
+
+    # Extract all public methods from each tool instance
+    # This automatically discovers tool functions without manual listing
+    tools: list[Callable[..., Any]] = []
+    for tool_instance in tool_instances:
+        for name, method in inspect.getmembers(
+            tool_instance, predicate=inspect.ismethod
+        ):
+            # Skip private methods (starting with _) and special methods (starting with __)
+            if not name.startswith("_"):
+                tools.append(method)
+
+    return tools

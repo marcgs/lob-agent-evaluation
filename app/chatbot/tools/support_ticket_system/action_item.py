@@ -3,8 +3,6 @@ import logging
 from datetime import datetime
 from typing import Annotated, Any
 
-from semantic_kernel.functions import kernel_function
-
 from app.chatbot.data_models.ticket_models import ActionItem, ActionItemStatus
 from app.chatbot.data_models.sample_data.sample_tickets import (
     ACTION_ITEMS_BY_ID,
@@ -12,7 +10,7 @@ from app.chatbot.data_models.sample_data.sample_tickets import (
 )
 
 
-class ActionItemPlugin:
+class ActionItemTools:
     """Action item management functions for the support ticket system"""
 
     def __init__(self):
@@ -21,10 +19,6 @@ class ActionItemPlugin:
         self._ticket_to_actions: dict[str, list[str]] = TICKET_TO_ACTIONS
         logging.info("Action Item Plugin initialized")
 
-    @kernel_function(
-        name="create_action_item",
-        description="Creates a new action item associated with a support ticket.",
-    )
     def create_action_item(
         self,
         parent_ticket_id: Annotated[
@@ -41,6 +35,7 @@ class ActionItemPlugin:
             str | None, "Due date for the action item in ISO format (YYYY-MM-DD)."
         ] = None,
     ) -> dict[str, Any]:
+        """Creates a new action item associated with a support ticket."""
         logging.info(f"Creating new action item for ticket: {parent_ticket_id}")
 
         # Generate a unique action item ID with "ACT-" prefix
@@ -74,22 +69,21 @@ class ActionItemPlugin:
             return {
                 "action_id": action_id,
                 "status": "created",
-                "created_at": action_item.created_at.isoformat() if action_item.created_at else None,
+                "created_at": action_item.created_at.isoformat()
+                if action_item.created_at
+                else None,
             }
         except ValueError as e:
             logging.error(f"Failed to create action item: {str(e)}")
             return {"error": f"Failed to create action item: {str(e)}"}
 
-    @kernel_function(
-        name="get_action_item",
-        description="Retrieves an action item by its ID.",
-    )
     def get_action_item(
         self,
         action_id: Annotated[
             str, "The unique identifier of the action item to retrieve."
         ],
     ) -> dict[str, Any]:
+        """Retrieves an action item by its ID."""
         logging.info(f"Retrieving action item: {action_id}")
 
         if action_id in self._action_items:
@@ -98,10 +92,6 @@ class ActionItemPlugin:
         else:
             return {"error": f"No action item found with ID: {action_id}"}
 
-    @kernel_function(
-        name="update_action_item_status",
-        description="Updates the status of an existing action item.",
-    )
     def update_action_item_status(
         self,
         action_id: Annotated[
@@ -112,6 +102,7 @@ class ActionItemPlugin:
             "New status for the action item. Must be one of ['Open', 'In Progress', 'Blocked', 'Completed', 'Cancelled'].",
         ],
     ) -> dict[str, Any]:
+        """Updates the status of an existing action item."""
         logging.info(f"Updating status for action item: {action_id}")
 
         if action_id not in self._action_items:
@@ -135,10 +126,6 @@ class ActionItemPlugin:
         except ValueError:
             return {"error": f"Invalid status value: {status}"}
 
-    @kernel_function(
-        name="update_action_item",
-        description="Updates an existing action item.",
-    )
     def update_action_item(
         self,
         action_id: Annotated[
@@ -147,13 +134,15 @@ class ActionItemPlugin:
         title: Annotated[str | None, "Updated title for the action item."] = None,
         assignee: Annotated[str | None, "Updated assignee for the action item."] = None,
         due_date: Annotated[
-            str | None, "Updated due date for the action item in ISO format (YYYY-MM-DD)."
+            str | None,
+            "Updated due date for the action item in ISO format (YYYY-MM-DD).",
         ] = None,
         status: Annotated[
             str | None,
             "Updated status for the action item. Must be one of ['Open', 'In Progress', 'Blocked', 'Completed', 'Cancelled'].",
         ] = None,
     ) -> dict[str, Any]:
+        """Updates an existing action item."""
         logging.info(f"Updating action item: {action_id}")
 
         if action_id not in self._action_items:
@@ -186,14 +175,11 @@ class ActionItemPlugin:
         except ValueError as e:
             return {"error": f"Failed to update action item: {str(e)}"}
 
-    @kernel_function(
-        name="get_ticket_action_items",
-        description="Retrieves all action items for a specific ticket.",
-    )
     def get_ticket_action_items(
         self,
         ticket_id: Annotated[str, "The ID of the ticket to get action items for."],
     ) -> dict[str, Any]:
+        """Retrieves all action items for a specific ticket."""
         logging.info(f"Retrieving action items for ticket: {ticket_id}")
 
         if ticket_id not in self._ticket_to_actions:
@@ -217,8 +203,12 @@ class ActionItemPlugin:
             "title": action_item.title,
             "assignee": action_item.assignee,
             "status": action_item.status.value,
-            "created_at": action_item.created_at.isoformat() if action_item.created_at else None,
-            "updated_at": action_item.updated_at.isoformat() if action_item.updated_at else None,
+            "created_at": action_item.created_at.isoformat()
+            if action_item.created_at
+            else None,
+            "updated_at": action_item.updated_at.isoformat()
+            if action_item.updated_at
+            else None,
         }
 
         if action_item.due_date:

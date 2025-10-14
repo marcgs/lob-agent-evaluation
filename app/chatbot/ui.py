@@ -18,10 +18,7 @@ async def main():
     chat_interface = gr.ChatInterface(
         type="messages",
         fn=bot.chat,
-        chatbot=gr.Chatbot(
-            type="messages",
-            value=[welcome_message],
-            scale=1),
+        chatbot=gr.Chatbot(type="messages", value=[welcome_message], scale=1),
         title=title,
         description="I can help you create and manage support tickets and action items.",
         theme="default",
