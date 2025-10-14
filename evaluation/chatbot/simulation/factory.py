@@ -30,6 +30,7 @@ def create_user_agent(
         chat_client=chat_client,
         temperature=0.3,
         top_p=0.8,
+        max_completion_tokens=2000,  # Limit output tokens for user agent responses
     )
 
     return agent

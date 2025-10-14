@@ -34,6 +34,7 @@ def create_support_ticket_agent(
         tool_choice="auto",  # Enable automatic tool calling
         temperature=0.3,
         top_p=0.9,
+        max_completion_tokens=4000,  # Limit output tokens to prevent exceeding context window
     )
 
     return agent
