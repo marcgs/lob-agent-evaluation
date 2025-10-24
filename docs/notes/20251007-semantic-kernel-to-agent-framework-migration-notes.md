@@ -1749,9 +1749,9 @@ After Phase 8 completion, Phase 9 evaluation revealed a critical behavioral diff
 #### Initial Misleading Results
 
 **Post-migration metrics showed dramatic "improvements":**
-- Precision_fn: +72.5% improvement (0.51 → 0.88)
-- Recall_fn: +31.6% improvement (0.76 → 1.00)  
-- Reliability: +29.9% improvement (0.77 → 1.00)
+- Precision_fn: +27% improvement (0.61 → 0.88)
+- Recall_fn: +17% improvement (0.83 → 1.00)  
+- Reliability: +16% improvement (0.84 → 1.00)
 
 #### Critical Discovery: Validation Gap
 
@@ -1800,19 +1800,14 @@ The original 12 test cases used **perfect simulated users** who always provided 
 **✅ SOLUTION APPLIED (October 10, 2025)**
 
 #### 1. Enhanced Function Docstrings
-Updated all plugin functions with comprehensive, descriptive docstrings to provide better context to Agent Framework:
+Updated all tool functions with comprehensive, descriptive docstrings to provide better context to Agent Framework.
+Semantic Kernel was providing extra information like Plugin names that had an effect on the LLM tool choice.
 
 ```python
 def create_support_ticket(
-    department_code: Annotated[str, "Department code (use get_departments for valid codes)"],
-    # ... other parameters
+    # ... params
 ) -> dict[str, object]:
-    """
-    Create a new support ticket with the provided information.
-    
-    Use get_departments(), get_priority_levels(), and get_workflow_types() 
-    to get valid values for the respective fields before creating tickets.
-    """
+    """Creates a new support ticket in the ticket management system."""
 ```
 
 #### 2. Explicit Workflow Instructions
@@ -1827,22 +1822,23 @@ Added explicit validation steps to the workflow definition (`support-ticket-work
 #### 3. Improved Parameter Descriptions  
 Made type annotations more explicit about validation requirements and relationships between functions.
 
+```python
+def create_support_ticket(
+    department_code: Annotated[str, "Department code responsible for handling the ticket. Must be a valid department code from the reference data."],
+    # ... other parameters
+) -> dict[str, object]:
+    # ...
+```
+
 ### Resolution Validation
-
-#### Post-Fix Evaluation Results
-
-**12-Test Dataset (Original):**
-```
-Precision_fn:   0.53  (53%)  [Down from 88% - now includes validation calls]
-Recall_fn:      0.92  (92%)  [Maintained high recall]
-Reliability:    0.92  (92%)  [Maintained high reliability]
-```
 
 **13-Test Dataset (With Invalid Input):**
 ```
-Precision_fn:   0.55  (55%)
-Recall_fn:      0.92  (92%)
-Reliability:    0.92  (92%)
+Precision_fn:   0.58  (58%)
+Recall_fn:      0.98  (98%)
+Precision_args: 0.89  (89%)
+Recall_args:    0.99  (99%)
+Reliability:    0.99  (99%)
 ```
 
 #### Critical Test Validation
@@ -1898,16 +1894,6 @@ This template-driven approach ensures the evaluation dataset stays synchronized 
 ### Final Migration Status
 
 **✅ MIGRATION APPROVED - Issue Resolved**
-
-**Comparison vs. Baseline (Semantic Kernel):**
-
-| Metric | Baseline | Post-Fix | Improvement |
-|--------|----------|----------|-------------|
-| Precision_fn | 0.51 (51%) | 0.55 (55%) | **+7.8%** |
-| Recall_fn | 0.76 (76%) | 0.92 (92%) | **+21.1%** |
-| Precision_args | 0.63 (63%) | 0.80 (80%) | **+27.0%** |
-| Recall_args | 0.78 (78%) | 0.91 (91%) | **+16.7%** |
-| Reliability | 0.77 (77%) | 0.92 (92%) | **+19.5%** |
 
 ### Key Lessons Learned
 
