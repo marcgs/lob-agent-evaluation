@@ -8,8 +8,6 @@
 
 This plan outlines the migration of the LOB Agent Evaluation project from Semantic Kernel to Microsoft Agent Framework. The migration will modernize the codebase with simplified APIs, better performance, and a unified interface across AI providers.
 
-**Note:** All phases are now complete! After Phase 7, several critical issues were discovered and fixed (documented as Phase 7b). These fixes revealed important patterns for Agent Framework usage that weren't obvious from documentation.
-
 ## Phase 1: Setup and Dependencies
 
 - [x] **Task 1.1:** Update `pyproject.toml` to replace `semantic-kernel` with `agent-framework`
@@ -190,81 +188,6 @@ The migration is complete when ALL of the following criteria are met:
    - `pyproject.toml` updated with correct Agent Framework packages
    - `uv.lock` reflects new dependency tree
    - No conflicting or unused dependencies
-
-## Lessons Learned (Post-Phase 7 Fixes)
-
-### Critical Discoveries Not in Original Plan
-
-The following issues were discovered during Phase 7 implementation and required additional work documented in Phase 7b:
-
-#### 1. Thread Management is Mandatory for Stateful Conversations
-
-**Problem:** Chatbot and simulations lost conversation context between messages.
-
-**Root Cause:** Agent Framework requires EXPLICIT thread passing to maintain state. Unlike Semantic Kernel's automatic history tracking, Agent Framework is explicit.
-
-**Solution:**
-```python
-# Create thread once
-thread = agent.get_new_thread()
-
-# Reuse for all messages in conversation
-response = await agent.run(message, thread=thread)
-```
-
-**Impact:** 2 additional commits (01b20b9, 6100aad) to fix chatbot and simulation thread management.
-
-#### 2. Multi-Agent Systems Need Thread Isolation
-
-**Problem:** In simulations, user agent saw chatbot's internal tool calls.
-
-**Root Cause:** Sharing a thread between agents exposes ALL messages (including tool calls) to both agents.
-
-**Solution:** Create separate threads per agent:
-```python
-agent_thread = support_ticket_agent.get_new_thread()
-user_thread = user_agent.get_new_thread()
-
-# Each agent uses its own isolated context
-agent_response = await support_ticket_agent.run(msg, thread=agent_thread)
-user_response = await user_agent.run(msg, thread=user_thread)
-```
-
-**Impact:** Required architectural change in simulation system.
-
-#### 3. LLM-Based Termination Strategy Required
-
-**Problem:** Simple string matching for task completion was unreliable (false positives/negatives).
-
-**Root Cause:** Natural language is too variable for keyword matching. Need semantic understanding.
-
-**Solution:** Implement LLM-as-judge pattern:
-- Create dedicated evaluation agent with zero temperature
-- Ask LLM to judge if task completion condition is met
-- Parse binary YES/NO response
-- Use fresh thread per evaluation to avoid context pollution
-
-**Impact:** 
-- Complete rewrite of termination strategy (127 lines)
-- Comprehensive test suite added (176 lines, 10 test cases)
-- Added `pytest-asyncio` dependency
-- 1 additional commit (634ceab)
-
-### Recommendations for Future Migrations
-
-1. **Plan for Thread Management Early:** Don't treat it as optional - it's fundamental to Agent Framework
-
-2. **Test Multi-Turn Conversations:** Single-turn tests won't catch thread management issues
-
-3. **Use LLM-as-Judge Pattern:** For semantic decisions like task completion, don't waste time on string matching
-
-4. **Test Agent Isolation:** In multi-agent systems, verify agents can't see each other's internal messages
-
-5. **Add Async Test Support Early:** Add `pytest-asyncio` at project start, not later
-
-6. **Document Thread Lifecycle:** Make thread creation and reuse patterns explicit in code comments
-
-7. **Zero Temperature for Evaluation:** Agents making binary decisions should use temperature=0.0
 
 ## Resources and References
 
